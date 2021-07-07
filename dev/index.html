@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Very Simple Turbo</title>
+    <script type="module" defer>
+      import { cache } from '../dist/index.es.js'
+      cache['dev'] = document.cloneNode(true)
+    </script>
+  </head>
+  <body>
+    <a href="devvv">Dev</a>
+    <a href="dev/test.html">Test</a>
+    <script type="module">
+      import { visitPage } from '../dist/index.es.js'
+      document.querySelectorAll('a').forEach((el) =>
+        el.addEventListener('click', (event) => {
+          event.preventDefault()
+          visitPage(el.getAttribute('href'))
+        })
+      )
+    </script>
+  </body>
+</html>
