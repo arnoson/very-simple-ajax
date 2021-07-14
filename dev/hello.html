@@ -4,17 +4,23 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Very Simple Turbo</title>
+    <title>Test Seite</title>
     <script src="/dev/index.js" type="module"></script>
+    <style>
+      body.test {
+        background-color: aquamarine;
+      }
+    </style>
   </head>
-  <body>
+  <body class="test">
     <ul>
       <li><a href="/dev" data-route>Home</a></li>
-      <li><a href="/dev/route/a" data-route>Route A</a></li>
-      <li><a href="/dev/route/b" data-route>Route B</a></li>
-      <li><a href="/dev/hello.html">Hello</a></li>
+      <li>
+        <a href="/dev/hello.html/world" data-route>Hello (world)</a>
+      </li>
+      <li><a href="/dev/hello.html/moon" data-route>Hello (moon)</a></li>
     </ul>
-    <div id="route">Route</div>
+    <div id="hello">Hello ...</div>
     <script type="module">
       import { visitPage } from '/dist/index.js'
       import { router } from '/dev/index.js'

@@ -1,8 +1,10 @@
 {
-  "name": "very-simple-turbo",
+  "name": "very-simple-links",
   "version": "0.0.0",
   "description": "",
   "main": "dist/index.es.js",
+  "types": "dist/types.d.ts",
+  "sideEffects": false,
   "scripts": {
     "build": "rm -rf ./dist && rollup --config --environment NODE_ENV:production",
     "dev": "rollup --config --watch",
@@ -13,6 +15,7 @@
   "devDependencies": {
     "rollup-plugin-dts": "^3.0.2",
     "rollup-plugin-esbuild": "^4.5.0",
-    "rollup-plugin-filesize": "^9.1.1"
+    "rollup-plugin-filesize": "^9.1.1",
+    "very-simple-router": "file:../very-simple-router"
   }
 }

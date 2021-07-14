@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 const types = {
   input: './src/index.ts',
   output: [{ file: 'dist/types.d.ts', format: 'es' }],
-  plugins: [dts()]
+  plugins: [dts()],
 }
 
 const bundle = {
@@ -15,8 +15,8 @@ const bundle = {
   output: { file: 'dist/index.es.js', format: 'es' },
   plugins: [
     esbuild({ minify: isProduction }),
-    fileSize({ showMinifiedSize: false, showBrotliSize: true })
-  ]
+    fileSize({ showMinifiedSize: false, showBrotliSize: true }),
+  ],
 }
 
 export default isProduction ? [bundle, types] : bundle
