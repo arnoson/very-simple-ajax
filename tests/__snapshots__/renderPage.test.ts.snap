@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`render page merges the heads and swaps the body 1`] = `
+<html>
+  <head>
+    
+    
+    <meta
+      charset="UTF-8"
+    />
+    
+    
+    <meta
+      content="IE=edge"
+      http-equiv="X-UA-Compatible"
+    />
+    
+    
+    <meta
+      content="width=device-width, initial-scale=1.0"
+      name="viewport"
+    />
+    
+    
+    <title>
+      New Title
+    </title>
+    
+    
+    <script
+      src="old-script.js"
+    />
+    
+    
+    <script
+      defer=""
+      src="common-script.js"
+    />
+    
+  
+    <script
+      src="new-script.js"
+    />
+  </head>
+  
+  
+  <body
+    class="new-body"
+  >
+    
+    
+    <h1>
+      New Body
+    </h1>
+    
+  
+
+
+  </body>
+</html>
+`;

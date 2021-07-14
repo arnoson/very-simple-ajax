@@ -8,11 +8,17 @@
   "scripts": {
     "build": "rm -rf ./dist && rollup --config --environment NODE_ENV:production",
     "dev": "rollup --config --watch",
-    "server": "php -S localhost:8888"
+    "server": "php -S localhost:8888",
+    "test": "jest"
   },
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
+    "@types/jest": "^26.0.24",
+    "@types/jsdom": "^16.2.13",
+    "esbuild": "^0.12.15",
+    "esbuild-jest": "^0.5.0",
+    "jest": "^27.0.6",
     "rollup-plugin-dts": "^3.0.2",
     "rollup-plugin-esbuild": "^4.5.0",
     "rollup-plugin-filesize": "^9.1.1",
