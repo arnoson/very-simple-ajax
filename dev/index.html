@@ -9,14 +9,18 @@
   </head>
   <body>
     <ul>
-      <li><a href="/dev" data-route>Home</a></li>
-      <li><a href="/dev/route/a" data-route>Route A</a></li>
-      <li><a href="/dev/route/b" data-route>Route B</a></li>
-      <li><a href="/dev/hello.html">Hello</a></li>
+      <li><a href="http://localhost:8888/dev" data-route>Home</a></li>
+      <li>
+        <a href="http://localhost:8888/dev/route/a" data-route>Route A</a>
+      </li>
+      <li>
+        <a href="http://localhost:8888/dev/route/b" data-route>Route B</a>
+      </li>
+      <li><a href="http://localhost:8888/dev/hello">Hello</a></li>
     </ul>
     <div id="route">Route</div>
     <script type="module">
-      import { visitPage } from '/dist/index.js'
+      import { visitPage } from '/dist/index.es.js'
       import { router } from '/dev/index.js'
 
       document.querySelectorAll('a').forEach((el) =>

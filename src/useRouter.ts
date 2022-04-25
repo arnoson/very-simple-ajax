@@ -1,7 +1,6 @@
 import Router from 'very-simple-router'
-import { renderPage } from './renderPage'
-import { cachePage } from './cachePage'
 import { watchHistory } from './watchHistory'
+import { visitPage } from './visitPage'
 
 export const useRouter = (router: Router) => {
   // Router is watching the history and is calling `beforeEach()` every time
@@ -33,20 +32,16 @@ export const useRouter = (router: Router) => {
 
   // Check before each route (or any history navigation) if we have to fetch the
   // necessary resource.
-  router.beforeEach(async (to) => {
+  router.on('before-route', async (to, _from, initial) => {
     const previousRoot = currentRoot
     currentRoot = roots[to.pattern] ?? to.path
 
-    if (previousRoot && previousRoot !== currentRoot) {
-      // Note: we're caching the page under it's root path, not the full path.
-      // So `/my-page/a` and `/my-page/b` would both use the same cache
+    if (!initial && previousRoot && previousRoot !== currentRoot) {
+      // Visit the page without causing a history action as the router already
+      // does this. We also use the the previous page's root path as it's cache
+      // id, so `/my-page/a` and `/my-page/b` would both use the same cache
       // `/my-page`.
-      cachePage(previousRoot)
-      await renderPage(currentRoot)
+      await visitPage(currentRoot, { action: null, cacheId: previousRoot })
     }
-  })
-
-  document.addEventListener('very-simple-links:visit', (event: CustomEvent) => {
-    currentRoot = event.detail.url
   })
 }

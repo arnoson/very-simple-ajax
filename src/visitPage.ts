@@ -1,18 +1,21 @@
 import { cachePage } from './cachePage'
 import { renderPage } from './renderPage'
+import { emit } from './utils/emit'
 
 /**
  * Load the html page (or use cached version), merge the `<head>` into the
  * current `<head>` and swap the body.
  */
-export const visitPage = async (url: string, { action = 'push' } = {}) => {
-  document.dispatchEvent(
-    new CustomEvent('very-simple-links:before-visit', { detail: { url } })
-  )
+export const visitPage = async (
+  url: string,
+  { action = 'push', cacheId = null } = {}
+) => {
+  emit('before-visit', { url })
 
-  cachePage(window.location.pathname)
+  cachePage(cacheId ?? window.location.pathname)
 
   await renderPage(url)
+  emit('load', { url })
 
   if (action === 'replace') {
     history.replaceState(null, null, url)
@@ -20,7 +23,5 @@ export const visitPage = async (url: string, { action = 'push' } = {}) => {
     history.pushState(null, null, url)
   }
 
-  document.dispatchEvent(
-    new CustomEvent('very-simple-links:visit', { detail: { url } })
-  )
+  emit('visit', { url })
 }
