@@ -1,27 +1,24 @@
 {
-  "name": "very-simple-links",
+  "name": "@very-simple/links",
   "version": "0.0.0",
   "description": "",
-  "main": "dist/index.es.js",
-  "types": "dist/types.d.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
   "sideEffects": false,
   "scripts": {
-    "build": "rm -rf ./dist && rollup --config --environment NODE_ENV:production",
-    "dev": "rollup --config --watch",
-    "server": "php -S localhost:8888",
-    "test": "jest"
+    "build": "shx rm -rf ./dist && tsup src/index.ts src/useRouter.ts --dts --format esm",
+    "dev": "vite",
+    "prepublishOnly": "npm run build",
+    "release": "np --no-2fa",
+    "test": "vitest run"
   },
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/jsdom": "^16.2.13",
-    "esbuild": "^0.12.15",
-    "esbuild-jest": "^0.5.0",
-    "jest": "^27.0.6",
-    "rollup-plugin-dts": "^3.0.2",
-    "rollup-plugin-esbuild": "^4.5.0",
-    "rollup-plugin-filesize": "^9.1.1",
-    "very-simple-router": "file:../very-simple-router"
+    "@very-simple/router": "^0.1.0",
+    "shx": "^0.3.4",
+    "tsup": "^5.12.7",
+    "vite": "^2.9.9"
   }
 }

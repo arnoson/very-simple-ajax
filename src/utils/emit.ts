@@ -1,4 +1,4 @@
-export const emit = (event: string, detail: any) => {
+export const emit = (event: 'before-visit' | 'visit', detail: any) => {
   document.dispatchEvent(
     new CustomEvent(`very-simple-links:${event}`, { detail })
   )

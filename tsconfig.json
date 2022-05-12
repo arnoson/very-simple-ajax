@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "lib": ["es2019", "dom"],
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "strict": true
   },
   "typeAcquisition": {
     "include": ["jest"]
