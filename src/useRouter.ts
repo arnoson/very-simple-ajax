@@ -1,9 +1,9 @@
 import router, { RouteAction } from '@very-simple/router'
-import links from '../src'
+import type { Links } from './Links'
 
 type Router = typeof router
 
-export const useRouter = (router: Router) => {
+export const useRouter = (links: Links, router: Router) => {
   // As a resource we define the url that has to be fetched. For example: there
   // might be a page that uses a router to show dynamic content based on an url
   // param. Its pattern could look like this: `/my-page/:param`. It doesn't

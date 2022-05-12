@@ -1,6 +1,8 @@
+import { copyAttributes } from './utils/copyAttributes'
 import { copyNode } from './utils/copyNode'
 import { emit } from './utils/emit'
 import { merge } from './utils/merge'
+import { replaceWith } from './utils/replaceWith'
 
 export interface VisitOptions {
   action?: 'push' | 'replace' | 'none'
@@ -8,16 +10,10 @@ export interface VisitOptions {
   cacheId?: string
 }
 
-export type LoadPageResponse = {
-  document?: Document
-  error?: Error
-  response?: Response
-}
-
 const parser = new DOMParser()
 
 export class Links {
-  private cache: Record<string, Document> = {}
+  private cachedDocuments: Record<string, Document> = {}
   private previousUrl: string | undefined
 
   start(watchHistory = true) {
@@ -32,8 +28,8 @@ export class Links {
   ) {
     emit('before-visit', { url })
 
-    this.cachePage(cacheId ?? this.previousUrl ?? window.location.pathname)
-    await this.renderPage(url, useCache)
+    this.cache(cacheId ?? this.previousUrl ?? window.location.pathname)
+    await this.render(url, useCache)
 
     if (action === 'replace') {
       history.replaceState(null, '', url)
@@ -45,55 +41,69 @@ export class Links {
     this.previousUrl = url
   }
 
-  private handlePopstate = async () => {
-    const url = window.location.pathname
-    console.log('visit', url)
-    await this.visit(url, { action: 'none', useCache: true })
-  }
+  private async render(url: string, useCache = false) {
+    const newDocument =
+      (useCache && this.cachedDocuments[url]) || (await this.load(url))
 
-  private cachePage(url: string) {
-    this.cache[url] = document.cloneNode(true) as Document
-  }
+    if (!newDocument) return
 
-  private async renderPage(url: string, useCache = false) {
-    let dom = this.cache[url]
-    if (!useCache || !dom) {
-      const { document, error } = await this.loadPage(url)
-      if (error) {
-        // There was a network error. We reload the page so the user sees the
-        // browser's network error page.
-        window.location.reload()
-        return
-      }
-      // Document could still be an error page, if the url doesn't exist, but
-      // thats actually a good thing as the user will see the servers error page.
-      dom = document!
-    }
-
-    document.title = dom.title
-    merge(document.head, dom.head)
+    document.title = newDocument.title
+    merge(document.head, newDocument.head)
+    const [container, newContainer] = this.getContainers(document, newDocument)
 
     // Copy each node with `copyNode()`, so `<script>` will get executed.
     const fragment = new DocumentFragment()
-    for (const child of Array.from(dom.body.childNodes)) {
+    for (const child of Array.from(newContainer.childNodes)) {
       fragment.appendChild(copyNode(child))
     }
 
-    // Clone the body to preserve any attributes.
-    document.body = dom.body.cloneNode() as HTMLBodyElement
-    document.body.appendChild(fragment)
+    const permanentElements = document.querySelectorAll('[data-permanent]')
+
+    container.innerHTML = ''
+    container.appendChild(fragment)
+    copyAttributes(container, newContainer)
+
+    permanentElements.forEach((el) => {
+      const copy = document.getElementById(el.id)
+      copy && replaceWith(copy, el)
+    })
   }
 
-  async loadPage(url: string): Promise<LoadPageResponse> {
+  private async load(url: string): Promise<Document | undefined> {
     try {
       const response = await fetch(url)
-      const document = parser.parseFromString(
-        await response.text(),
-        'text/html'
-      )
-      return { document, response }
-    } catch (error) {
-      return { error: error as Error }
+      return parser.parseFromString(await response.text(), 'text/html')
+    } catch (e) {
+      // There was a network error. We reload the page so the user sees the
+      // browser's network error page.
+      window.location.reload()
     }
+  }
+
+  private cache(url: string) {
+    this.cachedDocuments[url] = document.cloneNode(true) as Document
+  }
+
+  private getContainers(document: Document, newDocument: Document) {
+    const selector = newDocument.head.querySelector<HTMLMetaElement>(
+      "meta[name='very-simple-links:container']"
+    )?.content
+
+    const container = selector && document.querySelector(selector)
+    const newContainer = selector && newDocument.querySelector(selector)
+
+    if (newContainer && !container)
+      console.warn(
+        `Container '${selector}' doesn't exist, swapping body instead.`
+      )
+
+    return container && newContainer
+      ? [container, newContainer]
+      : [document.body, newDocument.body]
+  }
+
+  private handlePopstate = async () => {
+    const url = window.location.pathname
+    await this.visit(url, { action: 'none', useCache: true })
   }
 }

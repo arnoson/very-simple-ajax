@@ -11,14 +11,19 @@
     "dev": "vite",
     "prepublishOnly": "npm run build",
     "release": "np --no-2fa",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test-dev": "vitest watch"
   },
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
+    "@types/node": "^17.0.32",
     "@very-simple/router": "^0.1.0",
+    "happy-dom": "^3.2.0",
+    "jsdom": "^19.0.0",
     "shx": "^0.3.4",
     "tsup": "^5.12.7",
-    "vite": "^2.9.9"
+    "vite": "^2.9.9",
+    "vitest": "^0.12.4"
   }
 }

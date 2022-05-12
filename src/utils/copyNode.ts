@@ -1,11 +1,4 @@
-/**
- * Copy all attributes from the source element to the target element.
- */
-const copyAttributes = (source: Element, target: Element) => {
-  for (let i = 0; i < source.attributes.length; i++) {
-    target.setAttribute(source.attributes[i].name, source.attributes[i].value)
-  }
-}
+import { copyAttributes } from './copyAttributes'
 
 /**
  * Copy a script tag by creating a new one and copying all attributes and

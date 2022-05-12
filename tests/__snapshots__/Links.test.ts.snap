@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
-exports[`render page merges the heads and swaps the body 1`] = `
+exports[`Links > merges the heads and swaps the body 1`] = `
 <html>
   <head>
     
