@@ -1,6 +1,6 @@
 // Vitest Snapshot v1
 
-exports[`Links > merges the heads and swaps the body 1`] = `
+exports[`links > merges the heads and swaps the body 1`] = `
 <html>
   <head>
     
@@ -44,9 +44,7 @@ exports[`Links > merges the heads and swaps the body 1`] = `
   </head>
   
   
-  <body
-    class="new-body"
-  >
+  <body>
     
     
     <h1>

@@ -1,0 +1,5 @@
+export * from './containsNode'
+export * from './copyAttributes'
+export * from './copyNode'
+export * from './merge'
+export * from './replaceWith'

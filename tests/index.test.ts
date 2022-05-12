@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { Links } from '../src/Links'
+import * as links from '../src'
 import fs from 'fs/promises'
 import { resolve } from 'path'
 
@@ -15,10 +15,8 @@ const mockFetch = (content: string) => {
 const loadFile = async (file: string) =>
   (await fs.readFile(resolve(__dirname, file))).toString()
 
-describe('Links', () => {
+describe('links', () => {
   it('visits a new page', async () => {
-    const links = new Links()
-
     const documentMarkup =
       '<html><head><title>Test</title></head><body>Test</body></html>'
 
@@ -29,8 +27,6 @@ describe('Links', () => {
   })
 
   it('merges the heads and swaps the body', async () => {
-    const links = new Links()
-
     const oldPage = await loadFile('old-page.html')
     const newPage = await loadFile('new-page.html')
 

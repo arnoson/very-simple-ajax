@@ -1,6 +1,6 @@
 import router from '@very-simple/router'
 import { useRouter } from '../../src/useRouter'
-import links from '../../src'
+import * as links from '../../src'
 
 const initPage = () =>
   document.querySelectorAll('a').forEach((el) =>
@@ -15,4 +15,4 @@ document.addEventListener('DOMContentLoaded', initPage)
 
 useRouter(links, router)
 router.start()
-links.start(false)
+links.start({ watchHistory: false })
