@@ -45,7 +45,6 @@ export const visit = async (
 
 const render = async (url: string, useCache = false) => {
   const newDocument = (useCache && cache[url]) || (await load(url))
-
   if (!newDocument) return
 
   document.title = newDocument.title
@@ -54,9 +53,7 @@ const render = async (url: string, useCache = false) => {
 
   // Copy each node with `copyNode()`, so `<script>` will get executed.
   const fragment = new DocumentFragment()
-  for (const child of Array.from(newContainer.childNodes)) {
-    fragment.appendChild(copyNode(child))
-  }
+  newContainer.childNodes.forEach((el) => fragment.appendChild(copyNode(el)))
 
   const permanentElements = document.querySelectorAll('[data-permanent]')
 
