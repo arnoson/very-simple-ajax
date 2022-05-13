@@ -9,7 +9,7 @@
     <script type="module">
       import router from '@very-simple/router'
 
-      router.route('[/router/hello.html]/:name', ({ name }) => {
+      router.route('[/examples/router/hello.html]/:name', ({ name }) => {
         document.getElementById('hello').innerHTML = `Hello ${name}!`
       })
     </script>
@@ -21,12 +21,16 @@
   </head>
   <body class="test">
     <ul>
-      <li><a href="/router/index.html">Home</a></li>
+      <li><a href="/examples/router/index.html">Home</a></li>
       <li>
-        <a href="/router/hello.html/world" data-replace="true">Hello (world)</a>
+        <a href="/examples/router/hello.html/world" data-replace="true"
+          >Hello (world)</a
+        >
       </li>
       <li>
-        <a href="/router/hello.html/moon" data-replace="true">Hello (moon)</a>
+        <a href="/examples/router/hello.html/moon" data-replace="true"
+          >Hello (moon)</a
+        >
       </li>
     </ul>
     <div id="hello">Hello ...</div>
