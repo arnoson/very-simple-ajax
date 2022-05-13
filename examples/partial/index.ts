@@ -1,13 +1,13 @@
 import * as links from '../../src'
 
 const initPage = () => {
-  console.log('init page')
-  document.querySelectorAll('a').forEach((el) =>
-    el.addEventListener('click', async (event) => {
+  document.querySelectorAll<HTMLElement>('a:not([data-init])').forEach((el) => {
+    el.addEventListener('click', (event) => {
       event.preventDefault()
       links.visit(el.getAttribute('href'))
     })
-  )
+    el.dataset.init = 'true'
+  })
 }
 
 document.addEventListener('very-simple-links:visit', initPage)
