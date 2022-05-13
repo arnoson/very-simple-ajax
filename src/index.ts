@@ -1,4 +1,4 @@
-import { copyAttributes, copyNode, merge, replaceWith } from './utils'
+import { copyScript, merge, replaceWith } from './utils'
 
 export interface VisitOptions {
   action?: 'push' | 'replace' | 'none'
@@ -47,24 +47,22 @@ const render = async (url: string, useCache = false) => {
   const newDocument = (useCache && cache[url]) || (await load(url))
   if (!newDocument) return
 
-  document.title = newDocument.title
-  merge(document.head, newDocument.head)
   const [container, newContainer] = findContainers(document, newDocument)
 
-  // Copy each node with `copyNode()`, so `<script>` will get executed.
-  const fragment = new DocumentFragment()
-  newContainer.childNodes.forEach((el) => fragment.appendChild(copyNode(el)))
+  document.title = newDocument.title
+  merge(document.head, newDocument.head)
 
   const permanentElements = document.querySelectorAll('[data-permanent]')
-
-  container.innerHTML = ''
-  container.appendChild(fragment)
-  copyAttributes(container, newContainer)
+  replaceWith(container, newContainer)
 
   permanentElements.forEach((el) => {
     const copy = document.getElementById(el.id)
     copy && replaceWith(copy, el)
   })
+
+  // Force the browser to execute all body scripts.
+  const bodyScripts = document.body.querySelectorAll('script')
+  bodyScripts.forEach((el) => replaceWith(el, copyScript(el)))
 }
 
 const load = async (url: string): Promise<Document | undefined> => {

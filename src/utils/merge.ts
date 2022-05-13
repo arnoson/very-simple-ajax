@@ -1,5 +1,7 @@
-import { copyNode } from './copyNode'
-import { containsNode } from './containsNode'
+import { copyScript } from './copyScript'
+
+const containsNode = (nodes: Element[], node: Element) =>
+  nodes.find((el) => el.isEqualNode(node))
 
 /**
  * Add all new children from source to target. Ignore `<title>` as there should
@@ -12,7 +14,9 @@ export const merge = (target: HTMLElement, source: HTMLElement) => {
   const fragment = new DocumentFragment()
   for (const node of sourceNodes) {
     if (node.tagName !== 'TITLE' && !containsNode(targetNodes, node)) {
-      fragment.append(copyNode(node))
+      // Force the browser to execute any new scripts.
+      const isScript = node instanceof HTMLScriptElement
+      fragment.append(isScript ? copyScript(node) : node)
     }
   }
   target.append(fragment)
