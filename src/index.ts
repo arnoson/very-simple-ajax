@@ -60,9 +60,10 @@ const render = async (url: string, useCache = false) => {
     copy && replaceWith(copy, el)
   })
 
-  // Force the browser to execute all body scripts.
-  const bodyScripts = document.body.querySelectorAll('script')
-  bodyScripts.forEach((el) => replaceWith(el, copyScript(el)))
+  // Force the browser to execute scripts.
+  container
+    .querySelectorAll('script')
+    .forEach((el) => replaceWith(el, copyScript(el)))
 }
 
 const load = async (url: string): Promise<Document | undefined> => {
