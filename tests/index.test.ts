@@ -17,23 +17,51 @@ const loadFile = async (file: string) =>
 
 describe('links', () => {
   it('visits a new page', async () => {
-    const documentMarkup =
+    const page =
       '<html><head><title>Test</title></head><body>Test</body></html>'
 
-    mockFetch(documentMarkup)
+    mockFetch(page)
     await links.visit('test.html')
 
-    expect(document.documentElement.outerHTML).toBe(documentMarkup)
+    expect(document.documentElement.outerHTML).toBe(page)
   })
 
   it('merges the heads and swaps the body', async () => {
-    const oldPage = await loadFile('old-page.html')
-    const newPage = await loadFile('new-page.html')
+    const pageA = await loadFile('a.html')
+    const pageB = await loadFile('b.html')
 
-    document.documentElement.innerHTML = oldPage
-    mockFetch(newPage)
+    document.documentElement.innerHTML = pageA
+    mockFetch(pageB)
 
-    await links.visit('new-page.html')
+    await links.visit('b.html')
     expect(document.documentElement).toMatchSnapshot()
+  })
+
+  it('handles custom containers', async () => {
+    const pageA = await loadFile('container-a.html')
+    const pageB = await loadFile('container-b.html')
+
+    document.documentElement.innerHTML = pageA
+    mockFetch(pageB)
+
+    await links.visit('container-b.html')
+    expect(document.documentElement).toMatchSnapshot()
+  })
+
+  it('keeps permanent elements alive', async () => {
+    const page = `<html>
+      <head><title>Test</title></head>
+      <body>
+        <img data-permanent id="permanentImg" />
+      </body>
+    </html>`
+
+    document.documentElement.innerHTML = page
+    const permanentImg = document.getElementById('permanentImg')
+
+    mockFetch(page)
+    await links.visit('page.html')
+
+    expect(permanentImg).toBe(document.getElementById('permanentImg'))
   })
 })

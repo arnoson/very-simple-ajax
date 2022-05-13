@@ -1,5 +1,71 @@
 // Vitest Snapshot v1
 
+exports[`links > handles custom containers 1`] = `
+<html>
+  <head>
+    
+    
+    <meta
+      charset="UTF-8"
+    />
+    
+    
+    <meta
+      content="IE=edge"
+      http-equiv="X-UA-Compatible"
+    />
+    
+    
+    <meta
+      content="width=device-width, initial-scale=1.0"
+      name="viewport"
+    />
+    
+    
+    <title>
+      New Title
+    </title>
+    
+    
+    <script
+      src="new-script.js"
+    />
+    
+    
+    <script
+      defer=""
+      src="common-script.js"
+    />
+    
+  
+    <meta
+      content="#container"
+      name="very-simple-links:container"
+    />
+  </head>
+  
+  
+  <body>
+    
+    
+    <h1>
+      Old Body
+    </h1>
+    
+    
+    <div
+      id="container"
+    >
+      New Container
+    </div>
+    
+  
+
+
+  </body>
+</html>
+`;
+
 exports[`links > merges the heads and swaps the body 1`] = `
 <html>
   <head>
@@ -44,7 +110,9 @@ exports[`links > merges the heads and swaps the body 1`] = `
   </head>
   
   
-  <body>
+  <body
+    class="new-body"
+  >
     
     
     <h1>
