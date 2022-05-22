@@ -64,4 +64,14 @@ describe('links', () => {
 
     expect(permanentImg).toBe(document.getElementById('permanentImg'))
   })
+
+  it('calls hooks before and after each visit', async () => {
+    const handler = vi.fn()
+
+    links.on('before-visit', handler)
+    links.on('visit', handler)
+
+    await links.visit('test.html')
+    expect(handler).toBeCalledTimes(2)
+  })
 })
