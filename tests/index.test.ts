@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import * as links from '../src'
+import links from '../src'
 import fs from 'fs/promises'
 import { resolve } from 'path'
 
