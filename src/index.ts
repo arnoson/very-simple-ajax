@@ -1,5 +1,6 @@
 import { Config, VisitOptions } from './types'
 import { copyScript, merge, replaceWith } from './utils'
+import { on, off, emit } from './events'
 
 const parser = new DOMParser()
 const cache: Record<string, Document> = {}
@@ -61,13 +62,10 @@ const findContainers = (document: Document, newDocument: Document) => {
     : [document.body, newDocument.body]
 }
 
-const emit = (event: 'before-visit' | 'visit', detail: any) => {
-  document.dispatchEvent(
-    new CustomEvent(`very-simple-links:${event}`, { detail })
-  )
-}
-
 export default {
+  on,
+  off,
+
   start({ watchHistory = true } = {} as Config) {
     if (watchHistory) {
       window.addEventListener('popstate', async () => {
@@ -83,7 +81,7 @@ export default {
     url: string,
     { action = 'push', useCache, cacheId }: VisitOptions = {}
   ) {
-    emit('before-visit', { url })
+    await emit('before-visit', { url })
 
     cacheId = cacheId ?? previousUrl ?? window.location.pathname
     cache[cacheId] = document.cloneNode(true) as Document
@@ -95,7 +93,7 @@ export default {
       history.pushState(null, '', url)
     }
 
-    emit('visit', { url })
+    await emit('visit', { url })
     previousUrl = url
   },
 }

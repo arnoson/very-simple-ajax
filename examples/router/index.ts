@@ -10,9 +10,10 @@ const initPage = () =>
     })
   )
 
-document.addEventListener('very-simple-links:visit', initPage)
 document.addEventListener('DOMContentLoaded', initPage)
+links.on('visit', initPage)
 
 useRouter(links, router)
 router.start()
+
 links.start({ watchHistory: false })

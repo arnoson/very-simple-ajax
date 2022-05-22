@@ -26,8 +26,8 @@ const initPage = () =>
     })
   )
 
-document.addEventListener('very-simple-links:visit', initPage)
 document.addEventListener('DOMContentLoaded', initPage)
+links.on('visit', initPage)
 
 links.start()
 ```

@@ -7,3 +7,5 @@ export interface VisitOptions {
 export interface Config {
   watchHistory: boolean
 }
+
+export type LinksEvent = 'before-visit' | 'visit'
