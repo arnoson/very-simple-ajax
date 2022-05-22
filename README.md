@@ -3,6 +3,8 @@
 A very simple turbolinks inspired library. You can use it for progressive
 enhancements and to give your multi-page websites a SPA-like feel.
 
+💾 only ~1kb (minify and gzip)
+
 ## Installation
 
 ```
