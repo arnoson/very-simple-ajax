@@ -1,47 +1,9 @@
+import { Config, VisitOptions } from './types'
 import { copyScript, merge, replaceWith } from './utils'
-
-export interface VisitOptions {
-  action?: 'push' | 'replace' | 'none'
-  useCache?: boolean
-  cacheId?: string
-}
-
-export interface Config {
-  watchHistory: boolean
-  alwaysUseCache: boolean
-}
 
 const parser = new DOMParser()
 const cache: Record<string, Document> = {}
 let previousUrl: string | undefined
-
-export const start = ({ watchHistory = true } = {}) => {
-  if (watchHistory) {
-    window.addEventListener('popstate', async () => {
-      await visit(window.location.pathname, { action: 'none', useCache: true })
-    })
-  }
-}
-
-export const visit = async (
-  url: string,
-  { action = 'push', useCache, cacheId }: VisitOptions = {}
-) => {
-  emit('before-visit', { url })
-
-  cacheId = cacheId ?? previousUrl ?? window.location.pathname
-  cache[cacheId] = document.cloneNode(true) as Document
-  await render(url, useCache)
-
-  if (action === 'replace') {
-    history.replaceState(null, '', url)
-  } else if (action === 'push') {
-    history.pushState(null, '', url)
-  }
-
-  emit('visit', { url })
-  previousUrl = url
-}
 
 const render = async (url: string, useCache = false) => {
   const newDocument = (useCache && cache[url]) || (await load(url))
@@ -103,4 +65,37 @@ const emit = (event: 'before-visit' | 'visit', detail: any) => {
   document.dispatchEvent(
     new CustomEvent(`very-simple-links:${event}`, { detail })
   )
+}
+
+export default {
+  start({ watchHistory = true } = {} as Config) {
+    if (watchHistory) {
+      window.addEventListener('popstate', async () => {
+        await this.visit(window.location.pathname, {
+          action: 'none',
+          useCache: true,
+        })
+      })
+    }
+  },
+
+  async visit(
+    url: string,
+    { action = 'push', useCache, cacheId }: VisitOptions = {}
+  ) {
+    emit('before-visit', { url })
+
+    cacheId = cacheId ?? previousUrl ?? window.location.pathname
+    cache[cacheId] = document.cloneNode(true) as Document
+    await render(url, useCache)
+
+    if (action === 'replace') {
+      history.replaceState(null, '', url)
+    } else if (action === 'push') {
+      history.pushState(null, '', url)
+    }
+
+    emit('visit', { url })
+    previousUrl = url
+  },
 }

@@ -1,6 +1,6 @@
 import router from '@very-simple/router'
 import { useRouter } from '../../src/useRouter'
-import * as links from '../../src'
+import links from '../../src'
 
 const initPage = () =>
   document.querySelectorAll('a').forEach((el) =>

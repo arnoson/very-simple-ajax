@@ -16,7 +16,7 @@ page, merging its `<head>` and swapping in its `<body>`.
 
 ```js
 // shared.js
-import * as links from '../../src'
+import links from '@very-simple/links'
 
 const initPage = () =>
   document.querySelectorAll('a').forEach((el) =>
@@ -81,20 +81,22 @@ links.start()
 ### Visit
 
 ```ts
-links.visit(url: string, options?: VisitOptions)
+links.visit('some/url/', options?)
+```
 
+```ts
 interface VisitOptions {
   // Which `window.history` action should be performed, default is 'push'.
-  action?: 'push' | 'replace' | 'none';
+  action?: 'push' | 'replace' | 'none'
 
   // Wether or not to load the page from cache. Default is false (this will
   // still use a cached version for popstate events to simulate the default
   // browser behavior).
-  useCache?: boolean;
+  useCache?: boolean
 
   // Only needed in rare cases. Provide a custom id under which the current page
   // will be cached before visiting the new URL.
-  cacheId?: string;
+  cacheId?: string
 }
 ```
 
@@ -130,8 +132,8 @@ possibilities. You can use multiple html files that can each have their own
 virtual routes.
 
 ```js
-import * as links from '@very-simple/links'
-import * as router from '@very-simple/router'
+import links from '@very-simple/links'
+import router from '@very-simple/router'
 import { useRouter } from '@very-simple/links/useRouter'
 
 // Connect links and router.

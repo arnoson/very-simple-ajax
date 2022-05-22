@@ -1,4 +1,4 @@
-import * as links from '../../src'
+import links from '../../src'
 
 const initPage = () =>
   document.querySelectorAll('a').forEach((el) =>
