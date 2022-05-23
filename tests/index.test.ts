@@ -18,7 +18,7 @@ const loadFile = async (file: string) =>
 describe('links', () => {
   it('visits a new page', async () => {
     const page =
-      '<html><head><title>Test</title></head><body>Test</body></html>'
+      '<html style="--simple-progress: 0%;"><head><title>Test</title></head><body>Test</body></html>'
 
     mockFetch(page)
     await links.visit('test.html')
@@ -52,7 +52,7 @@ describe('links', () => {
     const page = `<html>
       <head><title>Test</title></head>
       <body>
-        <img data-permanent id="permanentImg" />
+        <img data-simple-permanent id="permanentImg" />
       </body>
     </html>`
 

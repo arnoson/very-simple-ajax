@@ -1,7 +1,9 @@
 // Vitest Snapshot v1
 
 exports[`links > handles custom containers 1`] = `
-<html>
+<html
+  style="--simple-progress: 0%;"
+>
   <head>
     
     
@@ -40,7 +42,7 @@ exports[`links > handles custom containers 1`] = `
   
     <meta
       content="#container"
-      name="very-simple-links:container"
+      name="simple-container"
     />
   </head>
   
@@ -67,7 +69,9 @@ exports[`links > handles custom containers 1`] = `
 `;
 
 exports[`links > merges the heads and swaps the body 1`] = `
-<html>
+<html
+  style="--simple-progress: 0%;"
+>
   <head>
     
     

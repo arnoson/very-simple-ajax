@@ -1,66 +1,8 @@
+import { emit, off, on } from './events'
+import { cache, render } from './render'
 import { Config, VisitOptions } from './types'
-import { copyScript, merge, replaceWith } from './utils'
-import { on, off, emit } from './events'
 
-const parser = new DOMParser()
-const cache: Record<string, Document> = {}
 let previousUrl: string | undefined
-
-const render = async (url: string, useCache = false) => {
-  const newDocument = (useCache && cache[url]) || (await load(url))
-  if (!newDocument) return
-
-  const [container, newContainer] = findContainers(document, newDocument)
-
-  document.title = newDocument.title
-  merge(document.head, newDocument.head)
-
-  const permanentElements = document.querySelectorAll('[data-permanent]')
-  replaceWith(container, newContainer)
-
-  permanentElements.forEach((el) => {
-    const copy = document.getElementById(el.id)
-    copy && replaceWith(copy, el)
-  })
-
-  // Force the browser to execute scripts.
-  container
-    .querySelectorAll('script')
-    .forEach((el) => replaceWith(el, copyScript(el)))
-}
-
-const load = async (url: string): Promise<Document | undefined> => {
-  try {
-    const response = await fetch(url)
-    return parser.parseFromString(await response.text(), 'text/html')
-  } catch (e) {
-    // There was a network error. We reload the page so the user sees the
-    // browser's network error page.
-    window.location.reload()
-  }
-}
-
-/**
- * Check if custom containers exists on both documents and return them. Fall
- * back to the documents' bodies otherwise.
- */
-const findContainers = (document: Document, newDocument: Document) => {
-  const selector = newDocument.head.querySelector<HTMLMetaElement>(
-    "meta[name='very-simple-links:container']"
-  )?.content
-
-  const container = selector && document.querySelector(selector)
-  const newContainer = selector && newDocument.querySelector(selector)
-
-  if (newContainer && !container)
-    console.warn(
-      `Container '${selector}' doesn't exist, swapping body instead.`
-    )
-
-  return container && newContainer
-    ? [container, newContainer]
-    : [document.body, newDocument.body]
-}
 
 export default {
   on,

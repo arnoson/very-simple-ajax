@@ -102,13 +102,55 @@ interface VisitOptions {
 }
 ```
 
+## Progress Bar
+
+Very Simple Links doesn't render a progress bar but provides you with everything
+to easily implement your own.
+
+Note: you have to include the progress bar element in every page.
+
+```html
+<head>
+  <link
+    rel="stylesheet"
+    href="node_modules/very-simple/links/dist/progress.css"
+  />
+</head>
+<body>
+  <!-- Make the progressbar permanent so the css transitions work even when
+  the new content is swapped in. -->
+  <div id="progress" data-simple-permanent></div>
+</body>
+```
+
+```css
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* The progress is available as a CSS variable (in %) */
+  width: var(--simple-progress);
+  height: 3px;
+  opacity: 0;
+  background-color: blue;
+  /* Animate the progress and make sure the animation can finish by delaying
+  the opacity */
+  transition: width 300ms ease-out, opacity 300ms steps(1);
+}
+
+/* A data attribute is added to the document root to indicate loading */
+:root[data-simple-loading] #progress {
+  opacity: 1;
+}
+```
+
 ## Custom Container
 
 By default the body is swapped, but you can specify a custom container instead.
 This is useful for partial page refreshes.
 
 ```html
-<meta name="very-simple-links:container" content="#my-container" />
+<meta name="simple-container" content="#my-container" />
 ```
 
 See `/examples/partial` for a full example.
@@ -119,10 +161,10 @@ If two pages contain the same element, it can be useful to keep the element
 alive instead of replacing it. For example, an image that shouldn't flicker or
 an animated header that shouldn't be reset between page visits.
 
-Permanent elements must have an id so they can be identified in both pages.
+Note: Permanent elements must have an id so they can be identified in both pages.
 
 ```html
-<img data-permanent id="my-permanent-image" src="img.gif" />
+<img data-simple-permanent id="my-permanent-image" src="img.gif" />
 ```
 
 See `/examples/partial`, which also includes a permanent image.

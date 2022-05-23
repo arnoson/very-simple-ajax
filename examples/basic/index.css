@@ -1,0 +1,14 @@
+#progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: var(--simple-progress);
+  opacity: 0;
+  transition: width 300ms ease-out, opacity 300ms steps(1);
+  background-color: red;
+}
+
+:root[data-simple-loading] #progress {
+  opacity: 1;
+}
