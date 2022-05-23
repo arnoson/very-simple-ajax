@@ -102,6 +102,31 @@ interface VisitOptions {
 }
 ```
 
+## Custom Container
+
+By default the body is swapped, but you can specify a custom container instead.
+This is useful for partial page refreshes.
+
+```html
+<meta name="simple-container" content="#my-container" />
+```
+
+See `/examples/partial` for a full example.
+
+## Permanent Elements
+
+If two pages contain the same element, it can be useful to keep the element
+alive instead of replacing it. For example, an image that shouldn't flicker or
+an animated header that shouldn't be reset between page visits.
+
+Note: Permanent elements must have an id so they can be identified in both pages.
+
+```html
+<img data-simple-permanent id="my-permanent-image" src="img.gif" />
+```
+
+See `/examples/partial`, which also includes a permanent image.
+
 ## Progress Bar
 
 Very Simple Links doesn't render a progress bar but provides you with everything
@@ -143,31 +168,6 @@ Note: you have to include the progress bar element in every page.
   opacity: 1;
 }
 ```
-
-## Custom Container
-
-By default the body is swapped, but you can specify a custom container instead.
-This is useful for partial page refreshes.
-
-```html
-<meta name="simple-container" content="#my-container" />
-```
-
-See `/examples/partial` for a full example.
-
-## Permanent Elements
-
-If two pages contain the same element, it can be useful to keep the element
-alive instead of replacing it. For example, an image that shouldn't flicker or
-an animated header that shouldn't be reset between page visits.
-
-Note: Permanent elements must have an id so they can be identified in both pages.
-
-```html
-<img data-simple-permanent id="my-permanent-image" src="img.gif" />
-```
-
-See `/examples/partial`, which also includes a permanent image.
 
 ## Together with Very Simple Router
 
