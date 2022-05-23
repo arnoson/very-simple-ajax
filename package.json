@@ -8,6 +8,10 @@
   "files": [
     "dist/**"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/very-simple/links.git"
+  },
   "scripts": {
     "build": "shx rm -rf ./dist && tsup src/index.ts src/useRouter.ts --dts --format esm",
     "dev": "vite",
