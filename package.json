@@ -1,6 +1,6 @@
 {
   "name": "@very-simple/links",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A very simple turbolinks inspired library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
