@@ -21,9 +21,9 @@ export default {
 
   async visit(
     url: string,
-    { action = 'push', useCache, cacheId }: VisitOptions = {}
+    { action = 'push', useCache, cacheId, silent }: VisitOptions = {}
   ) {
-    await emit('before-visit', { url })
+    !silent && (await emit('before-visit', { url }))
 
     cacheId = cacheId ?? previousUrl ?? window.location.pathname
     cache[cacheId] = document.cloneNode(true) as Document
@@ -35,7 +35,7 @@ export default {
       history.pushState(null, '', url)
     }
 
-    await emit('visit', { url })
+    !silent && (await emit('visit', { url }))
     previousUrl = url
   },
 }
