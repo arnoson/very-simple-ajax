@@ -4,11 +4,14 @@ import { copyScript, merge, replaceWith } from './utils'
 export const cache: Record<string, Document> = {}
 
 export const render = async (url: string, useCache = false) => {
-  const newDocument = (useCache && cache[url]) || (await load(url))
+  const cachedDocument = useCache && cache[url]
+  const newDocument = cachedDocument
+    ? (cachedDocument.cloneNode(true) as Document)
+    : await load(url)
+
   if (!newDocument) return
 
   const [container, newContainer] = findContainers(document, newDocument)
-
   document.title = newDocument.title
   merge(document.head, newDocument.head)
 
@@ -39,11 +42,6 @@ const findContainers = (document: Document, newDocument: Document) => {
 
   const container = selector && document.querySelector(selector)
   const newContainer = selector && newDocument.querySelector(selector)
-
-  if (newContainer && !container)
-    console.warn(
-      `Container '${selector}' doesn't exist, swapping body instead.`
-    )
 
   return container && newContainer
     ? [container, newContainer]
