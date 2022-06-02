@@ -31,16 +31,7 @@ export const load = async (url: string): Promise<Document | undefined> => {
 }
 
 const trickle = () => {
-  let amount = 0
-  if (progress < 0.2) {
-    amount = 0.1
-  } else if (progress < 0.5) {
-    amount = 0.04
-  } else if (progress < 0.8) {
-    amount = 0.02
-  } else if (progress < 0.99) {
-    amount = 0.005
-  }
+  const amount = -0.095 * progress + 0.1
   setProgress(progress + Math.random() * amount)
 }
 
