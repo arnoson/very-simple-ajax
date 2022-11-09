@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" data-head-script-count="0" data-body-script-count="0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="template" content="home" />
+    <title>Very Simple Links</title>
+    <script src="./index.ts" type="module"></script>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div id="progress" data-simple-permanent></div>
+    <a href="/example/about.html" id="about-link">About</a>
+    <h1 id="heading">Home</h1>
+    <script>
+      ;(() => {
+        const root = document.documentElement
+        const count = parseInt(root.dataset.bodyScriptCount ?? '0') + 1
+        root.dataset.bodyScriptCount = `${count}`
+      })()
+    </script>
+  </body>
+</html>

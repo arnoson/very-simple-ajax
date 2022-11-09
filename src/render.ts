@@ -26,7 +26,10 @@ export const render = async (url: string, useCache = false) => {
   })
 
   // Force the browser to execute scripts.
-  container
+  // newContainer
+  //   .querySelectorAll('script')
+  //   .forEach((el) => replaceWith(el, copyScript(el)))
+  newContainer
     .querySelectorAll('script')
     .forEach((el) => replaceWith(el, copyScript(el)))
 }
