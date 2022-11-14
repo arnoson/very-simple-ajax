@@ -11,7 +11,7 @@ export default {
   start({ watchHistory = true } = {} as Config) {
     if (watchHistory) {
       window.addEventListener('popstate', async () => {
-        await this.visit(window.location.pathname, {
+        await this.visit(window.location.pathname + window.location.search, {
           action: 'none',
           useCache: true,
         })
@@ -25,7 +25,11 @@ export default {
   ) {
     !silent && (await emit('before-visit', { url }))
 
-    cacheId = cacheId ?? previousUrl ?? window.location.pathname
+    cacheId =
+      cacheId ??
+      previousUrl ??
+      window.location.pathname + window.location.search
+
     cache[cacheId] = document.cloneNode(true) as Document
     await render(url, useCache)
 
