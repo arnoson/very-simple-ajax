@@ -22,12 +22,13 @@
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^18.11.9",
-    "@very-simple/router": "^0.2.0",
     "@playwright/test": "^1.27.1",
+    "@types/node": "^18.11.9",
+    "@very-simple/router": "^0.2.2",
     "np": "^7.6.1",
     "shx": "^0.3.4",
     "tsup": "^6.4.0",
+    "typescript": "^4.8.4",
     "vite": "^3.2.3"
   }
 }
