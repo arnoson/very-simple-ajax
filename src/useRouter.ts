@@ -1,4 +1,4 @@
-import router, { RouteAction } from '@very-simple/router'
+import router, { TypedRouteAction } from '@very-simple/router'
 import links from './index'
 
 type Router = typeof router
@@ -17,21 +17,22 @@ export const useRouter = (links: Links, router: Router) => {
   // We can now define a route like this: `router.route('[/my-page]/:param')`
   // where `/my-page` is the resource to fetch for the route.
   const route = router.route.bind(router)
-  router.route = (pattern: string, action: RouteAction) => {
+
+  router.route = <T extends string>(path: T, action: TypedRouteAction<T>) => {
     let resource = '/'
-    pattern = pattern.replace(/(\[.*\])/, (match) => {
+    path = path.replace(/(\[.*\])/, (match) => {
       resource = match.slice(1, -1)
       return resource
-    })
-    resources[pattern] = resource
-    route(pattern, action)
+    }) as T
+    resources[path] = resource
+    route(path, action)
   }
 
   // Check before each route (or any history navigation) if we have to fetch the
   // necessary resource.
   router.on('before-route', async (route) => {
     const previousResource = currentResource
-    currentResource = (route.pattern && resources[route.pattern]) ?? route.path
+    currentResource = (route.path && resources[route.path]) ?? route.path
 
     if (previousResource && previousResource !== currentResource) {
       // Visit the page without causing a history action as the router already
