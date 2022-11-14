@@ -6,7 +6,7 @@ import { randomBytes } from 'node:crypto'
 //   await client?.send('Network.setCacheDisabled', { cacheDisabled: true })
 // })
 
-test.only('page visit works', async ({ page }) => {
+test('page visit works', async ({ page }) => {
   await page.goto('/example/index.html')
   await expect(page).toHaveTitle(/Very Simple Links/)
 
@@ -49,7 +49,7 @@ test('head scripts are not re-executed', async ({ page }) => {
   expect(count).toBe('1')
 })
 
-test.only('body scripts are re-executed', async ({ page }) => {
+test('body scripts are re-executed', async ({ page }) => {
   await page.goto('/example/index.html')
   await page.locator('#about-link').click()
   await page.locator('#home-link').click()
