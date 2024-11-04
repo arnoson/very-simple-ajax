@@ -12,10 +12,11 @@ const initPage = () =>
     el.$init = true
   })
 
-document.addEventListener('DOMContentLoaded', initPage)
 links.on('visit', initPage)
 links.start()
-// @ts-ignore
+initPage()
+
+// @ts-ignore (only needed for tests)
 window.links = links
 
 const root = document.documentElement

@@ -27,13 +27,15 @@ test('permanent elements are kept alive', async ({ page }) => {
   const hash = randomBytes(20).toString('hex')
 
   await page.evaluate((hash) => {
-    document.querySelector<HTMLElement>('#progress')!.dataset.hash = hash
+    // @ts-ignore
+    document.querySelector<HTMLElement>('#progress')!.$hash = hash
   }, hash)
 
   await page.locator('#about-link').click()
 
   const newHash = await page.evaluate(
-    () => document.querySelector<HTMLElement>('#progress')!.dataset.hash
+    // @ts-ignore
+    () => document.querySelector<HTMLElement>('#progress')!.$hash
   )
 
   expect(newHash).toBe(hash)
@@ -49,14 +51,14 @@ test('head scripts are not re-executed', async ({ page }) => {
   expect(count).toBe('1')
 })
 
-test('body scripts are re-executed', async ({ page }) => {
+test('body scripts are not re-executed', async ({ page }) => {
   await page.goto('/example/index.html')
   await page.locator('#about-link').click()
   await page.locator('#home-link').click()
   const count = await page.evaluate(
     () => document.documentElement.dataset.bodyScriptCount
   )
-  expect(count).toBe('3')
+  expect(count).toBe('1')
 })
 
 test('custom containers are swapped', async ({ page }) => {

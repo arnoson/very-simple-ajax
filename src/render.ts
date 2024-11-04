@@ -1,5 +1,6 @@
 import { load } from './load'
-import { copyScript, merge, replaceWith } from './utils'
+// @ts-ignore (missing types)
+import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
 export const cache: Record<string, Document> = {}
 
@@ -12,26 +13,15 @@ export const render = async (url: string, useCache = false) => {
   if (!newDocument) return
 
   const [container, newContainer] = findContainers(document, newDocument)
-  document.title = newDocument.title
-  merge(document.head, newDocument.head)
-
-  const permanentElements = document.querySelectorAll(
-    '[id][data-simple-permanent]'
-  )
-  replaceWith(container, newContainer)
-
-  permanentElements.forEach((el) => {
-    const copy = document.getElementById(el.id)
-    copy && replaceWith(copy, el)
+  Idiomorph.morph(container, newContainer, {
+    callbacks: {
+      beforeNodeRemoved: (node: Element) => {
+        if (node instanceof HTMLElement && node.dataset.simpleKeep === 'true')
+          return false
+      },
+    },
   })
-
-  // Force the browser to execute scripts.
-  // newContainer
-  //   .querySelectorAll('script')
-  //   .forEach((el) => replaceWith(el, copyScript(el)))
-  newContainer
-    .querySelectorAll('script')
-    .forEach((el) => replaceWith(el, copyScript(el)))
+  Idiomorph.morph(document.head, newDocument.head)
 }
 
 /**

@@ -1,7 +1,7 @@
 # 🔗 Very Simple Links
 
-A very simple turbolinks inspired library. You can use it for progressive
-enhancements and to give your multi-page websites a SPA-like feel.
+A very simple turbolinks inspired library based on [Idiomorph](https://github.com/bigskysoftware/idiomorph).
+You can use it for progressive enhancements and to give your multi-page websites a SPA-like feel.
 
 💾 only ~1kb (minify and gzip)
 
@@ -21,17 +21,18 @@ page, merging its `<head>` and swapping in its `<body>`.
 import links from '@very-simple/links'
 
 const initPage = () =>
-  document.querySelectorAll('a').forEach((el) =>
+  document.querySelectorAll('a').forEach((el) => {
+    if ($el.init) return
     el.addEventListener('click', async (event) => {
       event.preventDefault()
       links.visit(el.getAttribute('href'))
     })
-  )
+    el.$init = true
+  })
 
-document.addEventListener('DOMContentLoaded', initPage)
 links.on('visit', initPage)
-
 links.start()
+initPage()
 ```
 
 ```html
@@ -39,16 +40,12 @@ links.start()
 <html>
   <head>
     <!-- Shared scripts in the `<head>` get only executed once. -->
-    <script src="./shared.js" type="module"></script>
+    <script src="./shared.js" type="module" defer></script>
     <title>Page A</title>
   </head>
   <body>
     Content A
     <a href="page-b.html">Go to Page B</a>
-    <script>
-      // Scripts in the body get executed on each page visit.
-      console.log('hello from Page A!')
-    </script>
   </body>
 </html>
 ```
@@ -57,7 +54,7 @@ links.start()
 <!-- page-b.html -->
 <html>
   <head>
-    <script src="./shared.js" type="module"></script>
+    <script src="./shared.js" type="module" defer></script>
     <title>Page B</title>
   </head>
   <body>
@@ -111,21 +108,16 @@ This is useful for partial page refreshes.
 <meta name="simple-container" content="#my-container" />
 ```
 
-See `/examples/partial` for a full example.
-
 ## Permanent Elements
 
 If two pages contain the same element, it can be useful to keep the element
-alive instead of replacing it. For example, an image that shouldn't flicker or
-an animated header that shouldn't be reset between page visits.
-
-Note: Permanent elements must have an id so they can be identified in both pages.
+alive instead of replacing it. For example, a video or an animated header that
+shouldn't be reset between page visits. Very Simple Links uses [Idiomorph](https://github.com/bigskysoftware/idiomorph),
+so elements with the same id will be kept alive instead if being replaced.
 
 ```html
-<img data-simple-permanent id="my-permanent-image" src="img.gif" />
+<video id="my-permanent-video" src="video.mp4"></video>
 ```
-
-See `/examples/partial`, which also includes a permanent image.
 
 ## Progress Bar
 
@@ -144,7 +136,7 @@ Note: you have to include the progress bar element in every page.
 <body>
   <!-- Make the progressbar permanent so the css transitions work even when
   the new content is swapped in. -->
-  <div id="progress" data-simple-permanent></div>
+  <div id="progress"></div>
 </body>
 ```
 
@@ -171,7 +163,7 @@ Note: you have to include the progress bar element in every page.
 
 ## Together with Very Simple Router
 
-Using very simple links together with very simple router opens up a lot of
+Using Very Simple Links together with Very Simple Router opens up a lot of
 possibilities. You can use multiple html files that can each have their own
 virtual routes.
 
@@ -186,5 +178,3 @@ router.start()
 // Make sure to disable watch history, as the router already does this!
 links.start({ watchHistory: false })
 ```
-
-See `examples/router` for a complete example.
