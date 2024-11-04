@@ -1,11 +1,8 @@
 {
   "compilerOptions": {
-    "lib": ["es2019", "dom"],
+    "lib": ["ESNext", "dom"],
     "moduleResolution": "node",
     "strict": true
-  },
-  "typeAcquisition": {
-    "include": ["jest"]
   },
   "include": ["src/**/*"],
   "exclude": ["dist"]
