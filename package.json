@@ -15,7 +15,8 @@
   "scripts": {
     "build": "rm -rf ./dist && tsup src/index.ts src/useRouter.ts --dts --format esm",
     "dev": "vite",
-    "test": "playwright test"
+    "test": "playwright test",
+    "release": "npm run build && npm run test && bumpp"
   },
   "author": "arnoson",
   "license": "MIT",
@@ -23,6 +24,7 @@
     "@playwright/test": "^1.48.2",
     "@types/node": "^18.19.64",
     "@very-simple/router": "^0.2.2",
+    "bumpp": "^9.8.1",
     "tsup": "8",
     "typescript": "^5",
     "vite": "^5"
