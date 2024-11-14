@@ -62,7 +62,7 @@ test('body scripts are not re-executed', async ({ page }) => {
 })
 
 test('custom containers are swapped', async ({ page }) => {
-  await page.goto('/example/container-a.html')
+  await page.goto('/example/container/a.html')
   await page.locator('#container-b-link').click()
 
   const h1 = page.locator('h1')
