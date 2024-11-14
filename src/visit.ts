@@ -1,3 +1,4 @@
+import { globalConfig } from './config'
 import { emit } from './events'
 import { load } from './load'
 import { merge } from './merge'
@@ -6,6 +7,8 @@ import { VisitOptions } from './types'
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
 export const cache = new Map<string, Document>()
+
+let currentVisitController: AbortController | undefined
 
 /**
  * Load a new page, merge the containers/bodies and add a new history entry
@@ -17,29 +20,33 @@ export const visit = async (
     action = 'push',
     emitEvents = true,
     isBackForward = false,
-    merge: mergeStrategy = 'replace',
+    merge: mergeStrategy = globalConfig.merge,
   }: VisitOptions = {}
 ) => {
+  // We only allow one pending visit request at a time. When triggering a new
+  // request while the last one is still pending we mimic browser behavior and
+  // cancel the pending one.
+  currentVisitController?.abort()
+  currentVisitController = new AbortController()
+
   if (emitEvents) await emit('before-visit', { url })
 
   let newDocument: Document | undefined
   if (isBackForward) {
     // If this is a back/forward navigation we simulate the browser behavior and
     // try to receive the document from cache ...
-    const cachedDocument = cache.get(url)
-    newDocument = cachedDocument
-      ? (cachedDocument.cloneNode(true) as Document)
-      : await load(url)
+    newDocument = cache.get(url)?.cloneNode(true) as Document | undefined
   } else {
     // ... otherwise we cache the document for future back/forward navigation
     // and load the document.
     const cacheId = window.location.pathname + window.location.search
     cache.set(cacheId, document.cloneNode(true) as Document)
-    newDocument = await load(url)
   }
 
-  // Theoretically, this should never happen, since `load()` will trigger a full
-  // page reload if something went wrong.
+  newDocument ??= await load(url, currentVisitController.signal)
+
+  // Only an aborted fetch would return an empty document, all other errors
+  // in `load()` trigger a reload.
   if (!newDocument) return
 
   if (emitEvents) await emit('before-render', { url, newDocument })
