@@ -1,5 +1,6 @@
 import { emit } from './events'
 import { load } from './load'
+import { merge } from './merge'
 import { VisitOptions } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
@@ -16,6 +17,7 @@ export const visit = async (
     action = 'push',
     emitEvents = true,
     isBackForward = false,
+    merge: mergeStrategy = 'replace',
   }: VisitOptions = {}
 ) => {
   if (emitEvents) await emit('before-visit', { url })
@@ -43,32 +45,8 @@ export const visit = async (
   if (emitEvents) await emit('before-render', { url, newDocument })
 
   const [container, newContainer] = findContainers(document, newDocument)
-  const manualReplacements: [HTMLElement, HTMLElement][] = []
-  Idiomorph.morph(container, newContainer, {
-    callbacks: {
-      beforeNodeMorphed(oldNode: Node, newNode: Node) {
-        // Each node could be a Very Simple Component that attached event
-        // listeners to itself or its children. In this case we have to replace
-        // the nodes manually instead of morphing in order to cleanup the
-        // listeners.
-
-        // Components can only be HTMLElements (they need to support dataset).
-        if (!(oldNode instanceof HTMLElement)) return true
-        if (!(newNode instanceof HTMLElement)) return true
-        const oldComponent = oldNode.dataset.simpleComponent
-        const newComponent = newNode.dataset.simpleComponent
-
-        // Nothing to clean up, if the old node isn't a component are both nodes
-        // are the same component.
-        if (!oldComponent || oldComponent === newComponent) return true
-
-        manualReplacements.push([oldNode, newNode])
-      },
-    },
-  })
   Idiomorph.morph(document.head, newDocument.head)
-
-  for (const [oldEl, newEl] of manualReplacements) oldEl.replaceWith(newEl)
+  merge(container, newContainer, mergeStrategy)
 
   if (action === 'replace') history.replaceState(null, '', url)
   else if (action === 'push') history.pushState(null, '', url)
