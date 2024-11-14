@@ -19,8 +19,8 @@ test('page visit works', async ({ page }) => {
   await expect(page).toHaveURL('/example/index.html')
 })
 
-test('permanent elements are kept alive (via idiomorph)', async ({ page }) => {
-  await page.goto('/example/index.html')
+test('permanent elements are kept alive', async ({ page }) => {
+  await page.goto('/example/permanent/index.html')
 
   // I haven't found a way to assert if two DOM nodes are the same. As a
   // workaround a random hash is created at runtime to identify the DOM node.
@@ -28,14 +28,14 @@ test('permanent elements are kept alive (via idiomorph)', async ({ page }) => {
 
   await page.evaluate((hash) => {
     // @ts-ignore
-    document.querySelector<HTMLElement>('#progress')!.$hash = hash
+    document.querySelector<HTMLElement>('#slider')!.$hash = hash
   }, hash)
 
-  await page.locator('#about-link').click()
+  await page.locator('#link').click()
 
   const newHash = await page.evaluate(
     // @ts-ignore
-    () => document.querySelector<HTMLElement>('#progress')!.$hash
+    () => document.querySelector<HTMLElement>('#slider')!.$hash
   )
 
   expect(newHash).toBe(hash)
