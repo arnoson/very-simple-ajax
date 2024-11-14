@@ -5,17 +5,25 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="simple-container" content="#container" />
-    <script src="./index.ts" type="module" defer></script>
+    <script src="../index.ts" type="module" defer></script>
     <title>Container B</title>
   </head>
   <body>
     <h1>Body B</h1>
-    <a id="container-a-link" href="/example/container-a.html"
-      >Swap Container A</a
+    <a
+      id="container-a-link"
+      data-simple-component="link"
+      href="/example/container/a.html"
     >
-    <a id="container-b-link" href="/example/container-b.html"
-      >Swap Container B</a
+      Swap Container A
+    </a>
+    <a
+      id="container-b-link"
+      data-simple-component="link"
+      href="/example/container/b.html"
     >
+      Swap Container B
+    </a>
     <div id="container">Container B</div>
   </body>
 </html>

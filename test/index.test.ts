@@ -19,7 +19,7 @@ test('page visit works', async ({ page }) => {
   await expect(page).toHaveURL('/example/index.html')
 })
 
-test('permanent elements are kept alive', async ({ page }) => {
+test('permanent elements are kept alive (via idiomorph)', async ({ page }) => {
   await page.goto('/example/index.html')
 
   // I haven't found a way to assert if two DOM nodes are the same. As a

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" data-head-script-count="0" data-body-script-count="0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="template" content="home" />
+    <title>Very Simple Links</title>
+    <script src="../index.ts" type="module" defer></script>
+    <link rel="stylesheet" href="./index.css" />
+  </head>
+  <body>
+    <div id="progress"></div>
+    <a data-simple-component="link" href="/example/components/no.html">
+      No Component
+    </a>
+    <a data-simple-component="link" href="/example/components/other.html">
+      Another Component
+    </a>
+    <h1 id="heading">Component</h1>
+    <div id="div" data-simple-component="counter">
+      <span data-ref="count">0</span>
+      <button data-ref="addOne">Add One</button>
+    </div>
+  </body>
+</html>

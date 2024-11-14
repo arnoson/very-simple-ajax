@@ -1,12 +1,9 @@
 export interface VisitOptions {
   action?: 'push' | 'replace' | 'none'
-  useCache?: boolean
-  cacheId?: string
-  silent?: boolean
+  emitEvents?: boolean
+  isBackForward?: boolean
 }
 
 export interface Config {
-  watchHistory: boolean
+  watchHistory?: boolean
 }
-
-export type LinksEvent = 'before-visit' | 'visit'

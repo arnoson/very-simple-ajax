@@ -10,8 +10,13 @@
     <link rel="stylesheet" href="./index.css" />
   </head>
   <body>
-    <div id="progress" data-simple-permanent></div>
-    <a href="/example/about.html" id="about-link">About</a>
+    <div id="progress"></div>
+    <a id="about-link" data-simple-component="link" href="/example/about.html">
+      About
+    </a>
+    <a id="about-link" data-simple-component="link" href="/example/huge.html">
+      Huge Page
+    </a>
     <h1 id="heading">Home</h1>
     <script>
       ;(() => {

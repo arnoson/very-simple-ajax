@@ -40,12 +40,8 @@ export const load = async (url: string): Promise<Document | undefined> => {
     }).text()
 
     clearTimeout(progressDelayTimeout)
-    setTimeout(() => {
-      // Without a small timeout transitions won't work on a permanent progress
-      // bar.
-      setProgress(1)
-      toggleLoading(false)
-    })
+    setProgress(1)
+    toggleLoading(false)
 
     return parser.parseFromString(html, 'text/html')
   } catch (e) {
