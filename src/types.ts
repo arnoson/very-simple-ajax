@@ -16,4 +16,5 @@ export type MergeStrategy =
 
 export interface Config {
   watchHistory?: boolean
+  merge?: MergeStrategy
 }
