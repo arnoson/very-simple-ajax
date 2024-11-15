@@ -7,13 +7,13 @@ export const load = async (url: string): Promise<Document | undefined> => {
   let progressDelayTimeout: number | undefined
 
   try {
-    setProgress(0)
-
     // We only allow one pending request at a time. When triggering a new request
     // while the last one is still pending we mimic browser behavior and cancel
     // the pending one.
     currentLoadController?.abort()
     currentLoadController = new AbortController()
+
+    setProgress(0)
 
     // Only show the progress bar if the page takes more than 500ms to load.
     progressDelayTimeout = window.setTimeout(() => toggleLoading(true), 500)

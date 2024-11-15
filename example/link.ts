@@ -1,4 +1,4 @@
-import links from '../src'
+import ajax from '../src'
 import { registerComponent } from '@very-simple/components'
 
 export default registerComponent('link', ({ el }) => {
@@ -7,6 +7,6 @@ export default registerComponent('link', ({ el }) => {
     if (!url) return
 
     e.preventDefault()
-    links.visit(url)
+    ajax.visit(url)
   })
 })

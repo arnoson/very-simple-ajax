@@ -18,3 +18,9 @@ export interface Config {
   watchHistory?: boolean
   merge?: MergeStrategy
 }
+
+export type EventMap = {
+  visit: { url: string }
+  'before-visit': { url: string }
+  'before-render': { url: string; newDocument: Document }
+}

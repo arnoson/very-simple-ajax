@@ -1,12 +1,19 @@
 import { globalConfig } from './config'
-import { emit } from './events'
 import { load } from './load'
 import { merge } from './merge'
-import { VisitOptions } from './types'
+import { EventMap, VisitOptions } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
 export const cache = new Map<string, Document>()
+
+const emit = async <E extends keyof EventMap>(
+  type: E,
+  payload: EventMap[E]
+) => {
+  const event = new CustomEvent(`very-simple-ajax:${type}`, { detail: payload })
+  document.dispatchEvent(event)
+}
 
 /**
  * Load a new page, merge the containers/bodies and add a new history entry
@@ -27,7 +34,7 @@ export const visit = async (
   // currentVisitController?.abort()
   // currentVisitController = new AbortController()
 
-  if (emitEvents) await emit('before-visit', { url })
+  if (emitEvents) emit('before-visit', { url })
 
   let newDocument: Document | undefined
   if (isBackForward) {
@@ -47,7 +54,7 @@ export const visit = async (
   // in `load()` trigger a reload.
   if (!newDocument) return
 
-  if (emitEvents) await emit('before-render', { url, newDocument })
+  if (emitEvents) emit('before-render', { url, newDocument })
 
   const [container, newContainer] = findContainers(document, newDocument)
   Idiomorph.morph(document.head, newDocument.head)
@@ -56,7 +63,7 @@ export const visit = async (
   if (action === 'replace') history.replaceState(null, '', url)
   else if (action === 'push') history.pushState(null, '', url)
 
-  if (emitEvents) await emit('visit', { url })
+  if (emitEvents) emit('visit', { url })
 }
 
 /**
