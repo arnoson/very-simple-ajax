@@ -8,8 +8,6 @@ import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
 export const cache = new Map<string, Document>()
 
-let currentVisitController: AbortController | undefined
-
 /**
  * Load a new page, merge the containers/bodies and add a new history entry
  * according to the action.
@@ -26,8 +24,8 @@ export const visit = async (
   // We only allow one pending visit request at a time. When triggering a new
   // request while the last one is still pending we mimic browser behavior and
   // cancel the pending one.
-  currentVisitController?.abort()
-  currentVisitController = new AbortController()
+  // currentVisitController?.abort()
+  // currentVisitController = new AbortController()
 
   if (emitEvents) await emit('before-visit', { url })
 
@@ -43,7 +41,7 @@ export const visit = async (
     cache.set(cacheId, document.cloneNode(true) as Document)
   }
 
-  newDocument ??= await load(url, currentVisitController.signal)
+  newDocument ??= await load(url)
 
   // Only an aborted fetch would return an empty document, all other errors
   // in `load()` trigger a reload.

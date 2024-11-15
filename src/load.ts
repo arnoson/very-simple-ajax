@@ -1,19 +1,26 @@
 const parser = new DOMParser()
 let progress = 0
 
-export const load = async (
-  url: string,
-  signal: AbortSignal
-): Promise<Document | undefined> => {
-  const progressDelayTimeout = window.setTimeout(() => toggleLoading(true), 500)
+let currentLoadController: AbortController | undefined
+
+export const load = async (url: string): Promise<Document | undefined> => {
+  let progressDelayTimeout: number | undefined
 
   try {
     setProgress(0)
+
+    // We only allow one pending request at a time. When triggering a new request
+    // while the last one is still pending we mimic browser behavior and cancel
+    // the pending one.
+    currentLoadController?.abort()
+    currentLoadController = new AbortController()
+
     // Only show the progress bar if the page takes more than 500ms to load.
+    progressDelayTimeout = window.setTimeout(() => toggleLoading(true), 500)
 
     const response = await fetch(url, {
       headers: { 'X-Very-Simple': '1' },
-      signal,
+      signal: currentLoadController.signal,
     })
     const reader = response.body?.getReader()
     const length = parseInt(response.headers.get('Content-Length') ?? '0')
@@ -46,7 +53,8 @@ export const load = async (
     return parser.parseFromString(html, 'text/html')
   } catch (e) {
     setProgress(0)
-    if (!signal.aborted) {
+    const isAbortError = e instanceof DOMException && e.name === 'AbortError'
+    if (isAbortError || currentLoadController?.signal.aborted) {
       // There was a network error. We reload the page so the user sees the
       // browser's network error page.
       window.location.reload()
