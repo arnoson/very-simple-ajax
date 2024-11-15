@@ -1,4 +1,4 @@
-# 🔗 Very Simple Links
+# 🔄 Very Simple Ajax
 
 A very simple turbolinks inspired library based on [Idiomorph](https://github.com/bigskysoftware/idiomorph).
 You can use it for progressive enhancements and to give your multi-page websites a SPA-like feel.
@@ -8,30 +8,30 @@ You can use it for progressive enhancements and to give your multi-page websites
 ## Installation
 
 ```
-npm install @very-simple/links
+npm install @very-simple/ajax
 ```
 
 ## Usage
 
-Intercept link clicks and let very simple links take care of fetching the new
+Intercept link clicks and let very simple ajax take care of fetching the new
 page, merging its `<head>` and swapping in its `<body>`.
 
 ```js
 // shared.js
-import links from '@very-simple/links'
+import ajax from '@very-simple/ajax'
 
 const initPage = () =>
   document.querySelectorAll('a').forEach((el) => {
     if ($el.init) return
     el.addEventListener('click', async (event) => {
       event.preventDefault()
-      links.visit(el.getAttribute('href'))
+      ajax.visit(el.getAttribute('href'))
     })
     el.$init = true
   })
 
-links.on('visit', initPage)
-links.start()
+ajax.on('visit', initPage)
+ajax.start()
 initPage()
 ```
 
@@ -71,16 +71,16 @@ Checkout the `/examples` folder for more examples.
 ### Start
 
 ```js
-links.start()
+ajax.start()
 
 // In some rare cases you might not want to watch popstate navigation. You can
-// disable it by calling `links.start({ watchHistory: false })`.
+// disable it by calling `ajax.start({ watchHistory: false })`.
 ```
 
 ### Visit
 
 ```ts
-links.visit('some/url/', options?)
+ajax.visit('some/url/', options?)
 ```
 
 ```ts
@@ -88,14 +88,15 @@ interface VisitOptions {
   // Which `window.history` action should be performed, default is 'push'.
   action?: 'push' | 'replace' | 'none'
 
-  // Wether or not to load the page from cache. Default is false (this will
-  // still use a cached version for popstate events to simulate the default
-  // browser behavior).
-  useCache?: boolean
-
-  // Only needed in rare cases. Provide a custom id under which the current page
-  // will be cached before visiting the new URL.
-  cacheId?: string
+  // The merge strategy to merge old and new content, default is 'replace'.
+  merge?:
+    | 'replace'
+    | 'morph'
+    | 'before'
+    | 'after'
+    | 'prepend'
+    | 'append'
+    | 'update'
 }
 ```
 
@@ -112,7 +113,7 @@ This is useful for partial page refreshes.
 
 If two pages contain the same element, it can be useful to keep the element
 alive instead of replacing it. For example, a video or an animated header that
-shouldn't be reset between page visits. Very Simple Links uses [Idiomorph](https://github.com/bigskysoftware/idiomorph),
+shouldn't be reset between page visits. Very Simple Ajax uses [Idiomorph](https://github.com/bigskysoftware/idiomorph),
 so elements with the same id will be kept alive instead if being replaced.
 
 ```html
@@ -121,7 +122,7 @@ so elements with the same id will be kept alive instead if being replaced.
 
 ## Progress Bar
 
-Very Simple Links doesn't render a progress bar but provides you with everything
+Very Simple Ajax doesn't render a progress bar but provides you with everything
 to easily implement your own.
 
 Note: you have to include the progress bar element in every page.
@@ -130,7 +131,7 @@ Note: you have to include the progress bar element in every page.
 <head>
   <link
     rel="stylesheet"
-    href="node_modules/very-simple/links/dist/progress.css"
+    href="node_modules/very-simple/ajax/dist/progress.css"
   />
 </head>
 <body>
@@ -159,22 +160,4 @@ Note: you have to include the progress bar element in every page.
 :root[data-simple-loading] #progress {
   opacity: 1;
 }
-```
-
-## Together with Very Simple Router
-
-Using Very Simple Links together with Very Simple Router opens up a lot of
-possibilities. You can use multiple html files that can each have their own
-virtual routes.
-
-```js
-import links from '@very-simple/links'
-import router from '@very-simple/router'
-import { useRouter } from '@very-simple/links/useRouter'
-
-// Connect links and router.
-useRouter(links, router)
-router.start()
-// Make sure to disable watch history, as the router already does this!
-links.start({ watchHistory: false })
 ```
