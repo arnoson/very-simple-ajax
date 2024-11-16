@@ -13,7 +13,7 @@ registerComponent('load-more', ({ el }) => {
 })
 
 const initPage = () => mountComponents()
-document.addEventListener('very-simple-ajax:visit', initPage)
+document.addEventListener('simple-ajax:visit', initPage)
 
 ajax.start()
 initPage()

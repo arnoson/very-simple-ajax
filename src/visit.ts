@@ -11,7 +11,7 @@ const emit = async <E extends keyof EventMap>(
   type: E,
   payload: EventMap[E]
 ) => {
-  const event = new CustomEvent(`very-simple-ajax:${type}`, { detail: payload })
+  const event = new CustomEvent(`simple-ajax:${type}`, { detail: payload })
   document.dispatchEvent(event)
 }
 
