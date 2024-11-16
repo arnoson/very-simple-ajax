@@ -3,6 +3,7 @@ export interface VisitOptions {
   emitEvents?: boolean
   isBackForward?: boolean
   merge?: MergeStrategy
+  morphHeads?: boolean
 }
 
 export type MergeStrategy =
@@ -13,6 +14,8 @@ export type MergeStrategy =
   | 'prepend'
   | 'append'
   | 'update'
+
+export type Regions = Map<string, HTMLElement>
 
 export interface Config {
   watchHistory?: boolean

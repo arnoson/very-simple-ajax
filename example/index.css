@@ -1,3 +1,5 @@
+@import '@picocss/pico';
+
 #progress {
   position: fixed;
   top: 0;
@@ -11,4 +13,13 @@
 
 :root[data-simple-loading] #progress {
   opacity: 1;
+}
+
+body {
+  padding: 2rem;
+}
+
+*:focus {
+  /* Add a thick outline do make focus-related debugging easier. */
+  outline: 3px solid red;
 }

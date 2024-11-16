@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="simple-container" content="#container" />
+    <script src="./index.ts" type="module" defer></script>
+    <link rel="stylesheet" href="/example/index.css" />
+    <title>Posts</title>
+  </head>
+  <body>
+    <div id="progress"></div>
+    <h1>Posts</h1>
+    <div id="posts" data-simple-ajax="append">
+      <article>1. Lore Ipsum</article>
+      <article>2. Lore Ipsum</article>
+      <article>3. Lore Ipsum</article>
+    </div>
+    <div id="navigation" data-simple-ajax="replace">
+      <a
+        data-simple-component="load-more"
+        href="/example/load-more/posts-1.html"
+      >
+        More
+      </a>
+    </div>
+  </body>
+</html>

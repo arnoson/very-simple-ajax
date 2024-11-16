@@ -21,6 +21,7 @@
   "author": "arnoson",
   "license": "MIT",
   "devDependencies": {
+    "@picocss/pico": "^2.0.6",
     "@playwright/test": "^1.48.2",
     "@types/node": "^18.19.64",
     "@very-simple/components": "^0.6.0",

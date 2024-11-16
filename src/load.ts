@@ -3,7 +3,10 @@ let progress = 0
 
 let currentLoadController: AbortController | undefined
 
-export const load = async (url: string): Promise<Document | undefined> => {
+export const load = async (
+  url: string,
+  regionIds: string[]
+): Promise<Document | undefined> => {
   let progressDelayTimeout: number | undefined
 
   try {
@@ -19,7 +22,10 @@ export const load = async (url: string): Promise<Document | undefined> => {
     progressDelayTimeout = window.setTimeout(() => toggleLoading(true), 500)
 
     const response = await fetch(url, {
-      headers: { 'X-Very-Simple': '1' },
+      headers: {
+        'X-Very-Simple-Request': 'true',
+        'X-Very-Simple-Regions': regionIds.join(' '),
+      },
       signal: currentLoadController.signal,
     })
     const reader = response.body?.getReader()

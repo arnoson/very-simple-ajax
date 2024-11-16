@@ -1,7 +1,7 @@
 import { globalConfig } from './config'
 import { load } from './load'
 import { merge } from './merge'
-import { EventMap, VisitOptions } from './types'
+import { EventMap, MergeStrategy, VisitOptions } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
@@ -22,9 +22,10 @@ const emit = async <E extends keyof EventMap>(
 export const visit = async (
   url: string,
   {
-    action = 'push',
+    action = 'none',
     emitEvents = true,
     isBackForward = false,
+    morphHeads = false,
     merge: mergeStrategy = globalConfig.merge,
   }: VisitOptions = {}
 ) => {
@@ -48,7 +49,8 @@ export const visit = async (
     cache.set(cacheId, document.cloneNode(true) as Document)
   }
 
-  newDocument ??= await load(url)
+  const regions = findRegions(document)
+  newDocument ??= await load(url, Array.from(regions.keys()))
 
   // Only an aborted fetch would return an empty document, all other errors
   // in `load()` trigger a reload.
@@ -56,15 +58,40 @@ export const visit = async (
 
   if (emitEvents) emit('before-render', { url, newDocument })
 
-  const [container, newContainer] = findContainers(document, newDocument)
-  Idiomorph.morph(document.head, newDocument.head)
-  merge(container, newContainer, mergeStrategy)
+  if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
+
+  const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
+    newEl.dataset.simpleAjax || oldEl.dataset.simpleAjax || mergeStrategy
+
+  const newRegions = findRegions(newDocument)
+  const regionKeys = new Set(regions.keys())
+  const newRegionKeys = new Set(newRegions.keys())
+  const commonRegionKeys = regionKeys.intersection(newRegionKeys)
+
+  if (commonRegionKeys.size) {
+    for (const id of commonRegionKeys) {
+      const region = regions.get(id)!
+      const newRegion = newRegions.get(id)!
+      const strategy = getMergeStrategy(region, newRegion)
+      merge(region, newRegion, strategy as MergeStrategy)
+    }
+  } else {
+    const strategy = getMergeStrategy(document.body, newDocument.body)
+    merge(document.body, newDocument.body, strategy as MergeStrategy)
+  }
 
   if (action === 'replace') history.replaceState(null, '', url)
   else if (action === 'push') history.pushState(null, '', url)
 
   if (emitEvents) emit('visit', { url })
 }
+
+const findRegions = (doc: Document) =>
+  new Map(
+    Array.from(doc.querySelectorAll<HTMLElement>('[data-simple-ajax][id]')).map(
+      (el) => [el.id, el]
+    )
+  )
 
 /**
  * Check if custom containers exists on both documents and return them. Fall
