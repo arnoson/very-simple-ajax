@@ -4,6 +4,7 @@ export interface VisitOptions {
   isBackForward?: boolean
   merge?: MergeStrategy
   morphHeads?: boolean
+  autoFocus?: boolean
 }
 
 export type MergeStrategy =

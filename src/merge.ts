@@ -3,31 +3,59 @@ import { MergeStrategy, Regions } from './types'
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
 export const merge = (
-  container: Element,
-  newContainer: Element,
+  region: HTMLElement,
+  newRegion: HTMLElement,
   strategy: MergeStrategy
-) => {
+): { autoFocusEl: HTMLElement | undefined } => {
+  let autoFocusEl: HTMLElement | undefined
+
   if (strategy === 'replace') {
-    container.replaceWith(newContainer)
+    region.replaceWith(newRegion)
   } else if (strategy === 'before') {
-    container.insertAdjacentElement('beforebegin', newContainer)
+    region.insertAdjacentElement('beforebegin', newRegion)
   } else if (strategy === 'after') {
-    container.insertAdjacentElement('afterend', newContainer)
+    region.insertAdjacentElement('afterend', newRegion)
   } else if (strategy === 'prepend') {
-    container.insertAdjacentElement('afterbegin', newContainer)
+    region.insertAdjacentElement('afterbegin', newRegion)
   } else if (strategy === 'append') {
-    container.insertAdjacentElement('beforeend', newContainer)
+    region.insertAdjacentElement('beforeend', newRegion)
   } else if (strategy === 'update') {
-    container.replaceChildren(...Array.from(newContainer.children))
+    region.replaceChildren(...Array.from(newRegion.children))
   } else if (strategy === 'morph') {
-    morph(container, newContainer)
+    const result = morph(region, newRegion)
+    autoFocusEl = result.autoFocusEl
   }
+
+  // Find the first auto focus element, where [data-simple-autofocus] wins over
+  // [autofocus].
+
+  // First test the new region itself ...
+  if (newRegion.hasAttribute('data-simple-autofocus') || newRegion.autofocus) {
+    autoFocusEl ??= newRegion
+  }
+  // ... then look into it's children.
+  autoFocusEl ??=
+    newRegion.querySelector<HTMLElement>('[data-simple-autofocus]') ??
+    newRegion.querySelector<HTMLElement>('[autofocus]') ??
+    undefined
+
+  return { autoFocusEl }
 }
 
 const morph = (container: Element, newContainer: Element) => {
   const manualReplacements: [HTMLElement, HTMLElement][] = []
+  let autoFocusEls: HTMLElement[] = []
+
   Idiomorph.morph(container, newContainer, {
     callbacks: {
+      afterNodeMorphed(_: Node, newNode: Node) {
+        if (
+          newNode instanceof HTMLElement &&
+          (newNode.autofocus || newNode.dataset.simpleAutofocus)
+        ) {
+          autoFocusEls.push(newNode)
+        }
+      },
       beforeNodeMorphed(oldNode: Node, newNode: Node) {
         // All following checks use dataset, which is only available on
         // HTMLElements.
@@ -57,4 +85,12 @@ const morph = (container: Element, newContainer: Element) => {
     },
   })
   for (const [oldEl, newEl] of manualReplacements) oldEl.replaceWith(newEl)
+
+  // Find the first auto focus element, where [data-simple-autofocus] wins over
+  // [autofocus].
+  const autoFocusEl =
+    autoFocusEls.find((el) => el.dataset.simpleAutofocus) ??
+    autoFocusEls.find((el) => el.autofocus)
+
+  return { autoFocusEl }
 }
