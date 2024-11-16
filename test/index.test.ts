@@ -8,7 +8,7 @@ import { randomBytes } from 'node:crypto'
 
 test('page visit works', async ({ page }) => {
   await page.goto('/example/index.html')
-  await expect(page).toHaveTitle(/Very Simple Links/)
+  await expect(page).toHaveTitle(/Very Simple Ajax/)
 
   await page.locator('#about-link').click()
   await expect(page).toHaveURL('/example/about.html')
