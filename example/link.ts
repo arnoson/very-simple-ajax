@@ -7,6 +7,6 @@ export default registerComponent('link', ({ el }) => {
     if (!url) return
 
     e.preventDefault()
-    ajax.visit(url)
+    ajax.visit(url, { action: 'push' })
   })
 })
