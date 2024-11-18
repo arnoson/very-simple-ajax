@@ -26,10 +26,16 @@ export const merge = (
     autoFocusEl = result.autoFocusEl
   }
 
-  // Find the first auto focus element, where [data-simple-autofocus] wins over
-  // [autofocus].
+  // Morph already replaced any permanent elements.
+  if (strategy !== 'morph') {
+    newRegion.querySelectorAll('[data-simple-permanent][id]').forEach((el) => {
+      const originalEL = region.querySelector(`#${el.id}`)
+      if (originalEL) el.replaceWith(originalEL)
+    })
+  }
 
-  // First test the new region itself ...
+  // Find the first auto focus element, where [data-simple-autofocus] wins over
+  // [autofocus]. First test the new region itself ...
   if (newRegion.hasAttribute('data-simple-autofocus') || newRegion.autofocus) {
     autoFocusEl ??= newRegion
   }
@@ -84,6 +90,7 @@ const morph = (container: Element, newContainer: Element) => {
       },
     },
   })
+
   for (const [oldEl, newEl] of manualReplacements) oldEl.replaceWith(newEl)
 
   // Find the first auto focus element, where [data-simple-autofocus] wins over
