@@ -30,26 +30,16 @@ export const visit = async (
     autoFocus = true,
   }: VisitOptions = {}
 ) => {
-  // We only allow one pending visit request at a time. When triggering a new
-  // request while the last one is still pending we mimic browser behavior and
-  // cancel the pending one.
-  // currentVisitController?.abort()
-  // currentVisitController = new AbortController()
-
   if (emitEvents) emit('before-visit', { url })
 
   let newDocument: Document | undefined
+  // If this is a back/forward navigation we simulate the browser behavior and
+  // try to receive the document from cache.
   if (isBackForward) {
-    // If this is a back/forward navigation we simulate the browser behavior and
-    // try to receive the document from cache ...
     newDocument = cache.get(url)?.cloneNode(true) as Document | undefined
-  } else {
-    // ... otherwise we cache the document for future back/forward navigation
-    // and load the document.
-    const cacheId = window.location.pathname + window.location.search
-    cache.set(cacheId, document.cloneNode(true) as Document)
   }
 
+  // Load the new document if we don't use it from cache.
   const regions = findRegions(document)
   newDocument ??= await load(url, Array.from(regions.keys()))
 
@@ -58,6 +48,15 @@ export const visit = async (
   if (!newDocument) return
 
   if (emitEvents) emit('before-render', { url, newDocument })
+
+  // Cache the previous document for future back/forward navigation. We do this
+  // after the before-render event is dispatched so we can prepare the previous
+  // document for caching (e.g. changing the DOM) while already having access
+  // to the new document.
+  if (!isBackForward) {
+    const cacheId = window.location.pathname + window.location.search
+    cache.set(cacheId, document.cloneNode(true) as Document)
+  }
 
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
