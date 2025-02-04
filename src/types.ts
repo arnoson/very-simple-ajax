@@ -28,3 +28,11 @@ export type EventMap = {
   'before-visit': { url: string }
   'before-render': { url: string; newDocument: Document }
 }
+
+type CustomEventMap = {
+  [K in keyof EventMap as `simple-ajax:${K & string}`]: CustomEvent<EventMap[K]>
+}
+
+declare global {
+  interface DocumentEventMap extends CustomEventMap {}
+}
