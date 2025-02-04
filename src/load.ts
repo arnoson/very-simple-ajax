@@ -1,6 +1,4 @@
 const parser = new DOMParser()
-let progress = 0
-
 let currentLoadController: AbortController | undefined
 
 export const load = async (
@@ -71,13 +69,11 @@ export const load = async (
   }
 }
 
-const setProgress = (value: number) => {
-  progress = value
+const setProgress = (value: number) =>
   document.documentElement.style.setProperty(
     '--simple-progress',
     `${value * 100}%`
   )
-}
 
 const toggleLoading = (state: boolean) =>
   document.documentElement.toggleAttribute('data-simple-loading', state)
