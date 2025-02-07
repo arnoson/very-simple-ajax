@@ -27,7 +27,8 @@ export const load = async (
       signal: currentLoadController.signal,
     })
     const reader = response.body?.getReader()
-    const length = parseInt(response.headers.get('Content-Length') ?? '0')
+    const contentLengthHeader = response.headers.get('Content-Length')
+    const length = parseInt(contentLengthHeader ?? '0')
     let receivedBytes = 0
 
     const stream = new ReadableStream({
@@ -41,7 +42,7 @@ export const load = async (
           }
 
           receivedBytes += value.length
-          setProgress(receivedBytes / length)
+          if (contentLengthHeader) setProgress(receivedBytes / length)
           controller.enqueue(value)
 
           read()
