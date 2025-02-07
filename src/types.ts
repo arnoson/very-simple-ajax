@@ -21,6 +21,7 @@ export type Regions = Map<string, HTMLElement>
 export interface Config {
   watchHistory?: boolean
   merge?: MergeStrategy
+  morphHeads?: boolean
 }
 
 export type EventMap = {
@@ -29,10 +30,10 @@ export type EventMap = {
   'before-render': { url: string; newDocument: Document }
 }
 
-type CustomEventMap = {
+type DomEventMap = {
   [K in keyof EventMap as `simple-ajax:${K & string}`]: CustomEvent<EventMap[K]>
 }
 
 declare global {
-  interface DocumentEventMap extends CustomEventMap {}
+  interface DocumentEventMap extends DomEventMap {}
 }
