@@ -52,21 +52,19 @@ const morph = (container: Element, newContainer: Element) => {
   const manualReplacements: [HTMLElement, HTMLElement][] = []
   let autoFocusEls: HTMLElement[] = []
 
+  // A list of attributes we want to keep unmodified/unremoved during the morph.
+  let currentNodeKeepAttributes: string[] = []
+
   Idiomorph.morph(container, newContainer, {
     callbacks: {
-      afterNodeMorphed(_: Node, newNode: Node) {
-        if (
-          newNode instanceof HTMLElement &&
-          (newNode.autofocus || newNode.dataset.simpleAutofocus)
-        ) {
-          autoFocusEls.push(newNode)
-        }
-      },
       beforeNodeMorphed(oldNode: Node, newNode: Node) {
         // All following checks use dataset, which is only available on
         // HTMLElements.
         if (!(oldNode instanceof HTMLElement)) return true
         if (!(newNode instanceof HTMLElement)) return true
+
+        currentNodeKeepAttributes =
+          oldNode.dataset.simpleKeepAttributes?.split(' ') ?? []
 
         // Check if the old node is permanent and the new one is matching.
         if (
@@ -87,6 +85,17 @@ const morph = (container: Element, newContainer: Element) => {
         if (!oldComponent || oldComponent === newComponent) return true
 
         manualReplacements.push([oldNode, newNode])
+      },
+      beforeAttributeUpdated: (name: string) => {
+        return !currentNodeKeepAttributes.includes(name)
+      },
+      afterNodeMorphed(_: Node, newNode: Node) {
+        if (
+          newNode instanceof HTMLElement &&
+          (newNode.autofocus || newNode.dataset.simpleAutofocus)
+        ) {
+          autoFocusEls.push(newNode)
+        }
       },
     },
   })
