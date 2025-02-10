@@ -25,10 +25,14 @@ export interface Config {
 }
 
 export type EventMap = {
-  visit: { url: string }
-  'before-visit': { url: string }
-  'before-render': { url: string; newDocument: Document }
+  visit: { url: string; prevUrl: string }
+  'before-visit': { url: string; prevUrl?: string }
+  'before-render': { url: string; prevUrl?: string; newDocument: Document }
 }
+
+export type SimpleVisitEvent = CustomEvent<EventMap['visit']>
+export type SimpleBeforeVisitEvent = CustomEvent<EventMap['before-visit']>
+export type SimpleBeforeRenderEvent = CustomEvent<EventMap['before-render']>
 
 type DomEventMap = {
   [K in keyof EventMap as `simple-ajax:${K & string}`]: CustomEvent<EventMap[K]>

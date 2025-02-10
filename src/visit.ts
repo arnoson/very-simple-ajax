@@ -15,6 +15,9 @@ const emit = async <E extends keyof EventMap>(
   document.dispatchEvent(event)
 }
 
+let currentUrl = window.location.pathname
+let prevUrl: string | undefined
+
 /**
  * Load a new page, merge the containers/bodies and add a new history entry
  * according to the action.
@@ -30,7 +33,10 @@ export const visit = async (
     autoFocus = true,
   }: VisitOptions = {}
 ) => {
-  if (emitEvents) emit('before-visit', { url })
+  prevUrl = currentUrl
+  currentUrl = url
+
+  if (emitEvents) emit('before-visit', { url, prevUrl })
 
   let newDocument: Document | undefined
   // If this is a back/forward navigation we simulate the browser behavior and
@@ -47,7 +53,7 @@ export const visit = async (
   // in `load()` trigger a reload.
   if (!newDocument) return
 
-  if (emitEvents) emit('before-render', { url, newDocument })
+  if (emitEvents) emit('before-render', { url, prevUrl, newDocument })
 
   // Cache the previous document for future back/forward navigation. We do this
   // after the before-render event is dispatched so we can prepare the previous
@@ -92,7 +98,7 @@ export const visit = async (
   if (action === 'replace') history.replaceState(null, '', url)
   else if (action === 'push') history.pushState(null, '', url)
 
-  if (emitEvents) emit('visit', { url })
+  if (emitEvents) emit('visit', { url, prevUrl })
 }
 
 const findRegions = (doc: Document) => {
