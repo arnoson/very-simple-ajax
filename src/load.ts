@@ -37,12 +37,20 @@ export const load = async (
           const { done, value } = await reader!.read()
 
           if (done) {
+            if (contentLengthHeader && receivedBytes > length) {
+              console.warn(
+                `Server sent more data (${receivedBytes} bytes) than specified in Content-Length header (${length} bytes).`
+              )
+            }
             controller.close()
             return
           }
 
           receivedBytes += value.length
-          if (contentLengthHeader) setProgress(receivedBytes / length)
+          if (contentLengthHeader) {
+            const progress = Math.min(receivedBytes / length, 1)
+            setProgress(progress)
+          }
           controller.enqueue(value)
 
           read()
