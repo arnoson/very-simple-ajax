@@ -73,7 +73,7 @@ export const load = async (
 const setProgress = (value: number) =>
   document.documentElement.style.setProperty(
     '--simple-progress',
-    `${value * 100}%`
+    `${Math.round(value * 10000) / 100}%`
   )
 
 const toggleLoading = (state: boolean) =>
