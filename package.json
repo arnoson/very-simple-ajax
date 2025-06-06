@@ -23,14 +23,14 @@
   "devDependencies": {
     "@picocss/pico": "^2.0.6",
     "@playwright/test": "^1.48.2",
-    "@types/node": "^18.19.64",
+    "@types/node": "^22.0",
     "@very-simple/components": "^0.6.0",
-    "bumpp": "^9.8.1",
+    "bumpp": "^10.0.0",
     "tsup": "8",
     "typescript": "^5",
-    "vite": "^5"
+    "vite": "^6"
   },
   "dependencies": {
-    "idiomorph": "^0.3.0"
+    "idiomorph": "^0.7.0"
   }
 }
