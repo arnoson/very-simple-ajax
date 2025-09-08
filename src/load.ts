@@ -1,9 +1,12 @@
+import { LoadingOptions } from './types'
+
 const parser = new DOMParser()
 let currentLoadController: AbortController | undefined
 
 export const load = async (
   url: string,
-  regionIds: string[]
+  regionIds: string[],
+  options: LoadingOptions
 ): Promise<Document | undefined> => {
   let progressDelayTimeout: number | undefined
 
@@ -16,8 +19,11 @@ export const load = async (
 
     setProgress(0)
 
-    // Only show the progress bar if the page takes more than 500ms to load.
-    progressDelayTimeout = window.setTimeout(() => toggleLoading(true), 500)
+    // Only show the progress bar if the page loading takes longer.
+    progressDelayTimeout = window.setTimeout(
+      () => toggleLoading(true),
+      options.loadingDelay
+    )
 
     const response = await fetch(url, {
       headers: {

@@ -30,6 +30,7 @@ export const visit = async (
     isBackForward = false,
     morphHeads = globalConfig.morphHeads,
     merge: mergeStrategy = globalConfig.merge,
+    loadingDelay = globalConfig.loadingDelay,
     autoFocus = true,
   }: VisitOptions = {}
 ) => {
@@ -47,7 +48,7 @@ export const visit = async (
 
   // Load the new document if we don't use it from cache.
   const regions = findRegions(document)
-  newDocument ??= await load(url, Array.from(regions.keys()))
+  newDocument ??= await load(url, Array.from(regions.keys()), { loadingDelay })
 
   // Only an aborted fetch would return an empty document, all other errors
   // in `load()` trigger a reload.

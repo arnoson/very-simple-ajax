@@ -6,10 +6,12 @@ export const start = ({
   watchHistory = true,
   merge = 'replace',
   morphHeads = true,
+  loadingDelay = 500,
 }: Config = {}) => {
   globalConfig.merge = merge
   globalConfig.watchHistory = watchHistory
   globalConfig.morphHeads = morphHeads
+  globalConfig.loadingDelay = loadingDelay
 
   if (watchHistory) {
     window.addEventListener('popstate', () => {
