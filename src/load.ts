@@ -14,7 +14,7 @@ export const load = async (
     // We only allow one pending request at a time. When triggering a new request
     // while the last one is still pending we mimic browser behavior and cancel
     // the pending one.
-    currentLoadController?.abort('cancel')
+    currentLoadController?.abort()
     currentLoadController = new AbortController()
 
     setProgress(0)
@@ -72,7 +72,8 @@ export const load = async (
     return parser.parseFromString(html, 'text/html')
   } catch (e) {
     setProgress(0)
-    if (e !== 'cancel') {
+    const isAbortError = e instanceof DOMException && e.name === 'AbortError'
+    if (!isAbortError) {
       // There was a network error. We reload the page so the user sees the
       // browser's network error page.
       window.location.reload()
