@@ -7,7 +7,7 @@ export const load = async (
   url: string,
   regionIds: string[],
   options: LoadingOptions
-): Promise<Document | undefined> => {
+): Promise<{ document: Document; url: string } | undefined> => {
   let progressDelayTimeout: number | undefined
 
   try {
@@ -32,44 +32,10 @@ export const load = async (
       },
       signal: currentLoadController.signal,
     })
-    const reader = response.body?.getReader()
-    const contentLengthHeader = response.headers.get('Content-Length')
-    const length = parseInt(contentLengthHeader ?? '0')
-    let receivedBytes = 0
 
-    const stream = new ReadableStream({
-      start(controller) {
-        const read = async () => {
-          const { done, value } = await reader!.read()
-
-          if (done) {
-            if (contentLengthHeader && receivedBytes > length) {
-              console.warn(
-                `Server sent more data (${receivedBytes} bytes) than specified in Content-Length header (${length} bytes).`
-              )
-            }
-            controller.close()
-            return
-          }
-
-          receivedBytes += value.length
-          if (contentLengthHeader) {
-            const progress = Math.min(receivedBytes / length, 1)
-            setProgress(progress)
-          }
-          controller.enqueue(value)
-
-          read()
-        }
-        read()
-      },
-    })
-
-    const html = await new Response(stream, {
-      headers: { 'Content-Type': 'text/html' },
-    }).text()
-
-    return parser.parseFromString(html, 'text/html')
+    const html = await response.text()
+    const document = parser.parseFromString(html, 'text/html')
+    return { document, url: response.url }
   } catch (e) {
     setProgress(0)
     const isAbortError = e instanceof DOMException && e.name === 'AbortError'
