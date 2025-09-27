@@ -2,6 +2,8 @@ import { LoadingOptions } from './types'
 
 const parser = new DOMParser()
 let currentLoadController: AbortController | undefined
+let progress = 0
+let trickleInterval: number | undefined
 
 export const load = async (
   url: string,
@@ -18,12 +20,12 @@ export const load = async (
     currentLoadController = new AbortController()
 
     setProgress(0)
-
     // Only show the progress bar if the page loading takes longer.
-    progressDelayTimeout = window.setTimeout(
-      () => toggleLoading(true),
-      options.loadingDelay
-    )
+    progressDelayTimeout = window.setTimeout(() => {
+      toggleLoading(true)
+      toggleProgress(true)
+      startTrickle()
+    }, options.loadingDelay)
 
     const response = await fetch(url, {
       headers: {
@@ -46,15 +48,32 @@ export const load = async (
     }
   } finally {
     clearTimeout(progressDelayTimeout)
+    stopTrickle()
+    setProgress(1)
     toggleLoading(false)
+    setTimeout(() => toggleProgress(false), options.progressHideDelay)
   }
 }
 
-const setProgress = (value: number) =>
+const trickle = () => {
+  const amount = -0.095 * progress + 0.1
+  setProgress(progress + Math.random() * amount)
+}
+
+const startTrickle = () => (trickleInterval = window.setInterval(trickle, 300))
+
+const stopTrickle = () => clearInterval(trickleInterval)
+
+const setProgress = (value: number) => {
+  progress = value
   document.documentElement.style.setProperty(
     '--simple-progress',
     `${Math.round(value * 10000) / 100}%`
   )
+}
+
+const toggleProgress = (state: boolean) =>
+  document.documentElement.toggleAttribute('data-simple-progress', state)
 
 const toggleLoading = (state: boolean) =>
   document.documentElement.toggleAttribute('data-simple-loading', state)

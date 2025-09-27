@@ -5,4 +5,5 @@ export const globalConfig: Required<Config> = {
   morphHeads: true,
   merge: 'replace',
   loadingDelay: 500,
+  progressHideDelay: 500,
 }

@@ -6,10 +6,12 @@ export interface VisitOptions {
   morphHeads?: boolean
   autoFocus?: boolean
   loadingDelay?: number
+  progressHideDelay?: number
 }
 
 export interface LoadingOptions {
   loadingDelay?: number
+  progressHideDelay?: number
 }
 
 export type MergeStrategy =
@@ -28,6 +30,7 @@ export interface Config {
   merge?: MergeStrategy
   morphHeads?: boolean
   loadingDelay?: number
+  progressHideDelay?: number
 }
 
 export type EventMap = {

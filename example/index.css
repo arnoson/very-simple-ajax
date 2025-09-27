@@ -6,13 +6,12 @@
   left: 0;
   height: 3px;
   width: var(--simple-progress);
-  opacity: 0;
-  transition: width 300ms ease-out, opacity 300ms steps(1);
+  transition: width 300ms ease-out;
   background-color: red;
-}
 
-:root[data-simple-loading] #progress {
-  opacity: 1;
+  :root:not([data-simple-progress]) & {
+    display: none;
+  }
 }
 
 body {

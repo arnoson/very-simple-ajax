@@ -31,6 +31,7 @@ export const visit = async (
     morphHeads = globalConfig.morphHeads,
     merge: mergeStrategy = globalConfig.merge,
     loadingDelay = globalConfig.loadingDelay,
+    progressHideDelay = globalConfig.progressHideDelay,
     autoFocus = true,
   }: VisitOptions = {}
 ) => {
@@ -40,15 +41,21 @@ export const visit = async (
   if (emitEvents) emit('before-visit', { url, prevUrl })
 
   let newDocument: Document | undefined
+
   // If this is a back/forward navigation we simulate the browser behavior and
   // try to receive the document from cache.
   if (isBackForward) {
     newDocument = cache.get(url)?.cloneNode(true) as Document | undefined
   }
 
-  // Load the new document if we don't use it from cache.
+  // Load the new document if we don't use it from cache. There might also be
+  // a server-side redirect, so we update the url.
   const regions = findRegions(document)
-  newDocument ??= await load(url, Array.from(regions.keys()), { loadingDelay })
+  if (!newDocument) {
+    const options = { loadingDelay, progressHideDelay }
+    const result = await load(url, Array.from(regions.keys()), options)
+    if (result) ({ url, document: newDocument } = result)
+  }
 
   // Only an aborted fetch would return an empty document, all other errors
   // in `load()` trigger a reload.
