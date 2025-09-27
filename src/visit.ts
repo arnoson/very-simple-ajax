@@ -33,6 +33,7 @@ export const visit = async (
     loadingDelay = globalConfig.loadingDelay,
     progressHideDelay = globalConfig.progressHideDelay,
     autoFocus = true,
+    request,
   }: VisitOptions = {}
 ) => {
   prevUrl = currentUrl
@@ -52,7 +53,7 @@ export const visit = async (
   // a server-side redirect, so we update the url.
   const regions = findRegions(document)
   if (!newDocument) {
-    const options = { loadingDelay, progressHideDelay }
+    const options = { loadingDelay, progressHideDelay, request }
     const result = await load(url, Array.from(regions.keys()), options)
     if (result) ({ url, document: newDocument } = result)
   }

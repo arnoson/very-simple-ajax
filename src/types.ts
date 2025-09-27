@@ -7,11 +7,13 @@ export interface VisitOptions {
   autoFocus?: boolean
   loadingDelay?: number
   progressHideDelay?: number
+  request?: RequestInit
 }
 
 export interface LoadingOptions {
   loadingDelay?: number
   progressHideDelay?: number
+  request?: RequestInit
 }
 
 export type MergeStrategy =

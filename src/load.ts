@@ -28,7 +28,9 @@ export const load = async (
     }, options.loadingDelay)
 
     const response = await fetch(url, {
+      ...options.request,
       headers: {
+        ...options.request?.headers,
         'X-Very-Simple-Request': 'true',
         'X-Very-Simple-Regions': regionIds.join(' '),
       },
