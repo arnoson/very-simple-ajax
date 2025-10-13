@@ -1,4 +1,4 @@
-import { MergeStrategy, Regions } from './types'
+import { MergeStrategy } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 

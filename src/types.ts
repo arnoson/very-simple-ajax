@@ -8,6 +8,7 @@ export interface VisitOptions {
   loadingDelay?: number
   progressHideDelay?: number
   request?: RequestInit
+  regions?: string[]
 }
 
 export interface LoadingOptions {
@@ -24,8 +25,6 @@ export type MergeStrategy =
   | 'prepend'
   | 'append'
   | 'update'
-
-export type Regions = Map<string, HTMLElement>
 
 export interface Config {
   watchHistory?: boolean

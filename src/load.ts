@@ -7,7 +7,7 @@ let trickleInterval: number | undefined
 
 export const load = async (
   url: string,
-  regionIds: string[],
+  regions: string[],
   options: LoadingOptions
 ): Promise<{ document: Document; url: string } | undefined> => {
   let progressDelayTimeout: number | undefined
@@ -32,7 +32,7 @@ export const load = async (
       headers: {
         ...options.request?.headers,
         'X-Very-Simple-Request': 'true',
-        'X-Very-Simple-Regions': regionIds.join(' '),
+        'X-Very-Simple-Regions': regions.join(' '),
       },
       signal: currentLoadController.signal,
     })

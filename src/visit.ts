@@ -1,7 +1,7 @@
 import { globalConfig } from './config'
 import { load } from './load'
 import { merge } from './merge'
-import { EventMap, MergeStrategy, Regions, VisitOptions } from './types'
+import { EventMap, MergeStrategy, VisitOptions } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
@@ -34,6 +34,7 @@ export const visit = async (
     progressHideDelay = globalConfig.progressHideDelay,
     autoFocus = true,
     request,
+    regions = [],
   }: VisitOptions = {}
 ) => {
   prevUrl = currentUrl
@@ -51,10 +52,9 @@ export const visit = async (
 
   // Load the new document if we don't use it from cache. There might also be
   // a server-side redirect, so we update the url.
-  const regions = findRegions(document)
   if (!newDocument) {
     const options = { loadingDelay, progressHideDelay, request }
-    const result = await load(url, Array.from(regions.keys()), options)
+    const result = await load(url, regions, options)
     if (result) ({ url, document: newDocument } = result)
   }
 
@@ -76,19 +76,20 @@ export const visit = async (
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
-    newEl.dataset.simpleAjax || oldEl.dataset.simpleAjax || mergeStrategy
+    newEl.dataset.simpleMerge || oldEl.dataset.simpleMerge || mergeStrategy
 
   let autoFocusEl: HTMLElement | undefined
-  const newRegions = findRegions(newDocument)
-  const regionKeys = new Set(regions.keys())
-  const newRegionKeys = new Set(newRegions.keys())
-  const commonRegionKeys = regionKeys.intersection(newRegionKeys)
-  const hasCommonRegions = commonRegionKeys.size > 0
 
-  if (hasCommonRegions) {
-    for (const id of commonRegionKeys) {
-      const region = regions.get(id)!
-      const newRegion = newRegions.get(id)!
+  const hasMatchingRegions = regions?.some(
+    (selector) =>
+      document.querySelector(selector) && newDocument.querySelector(selector)
+  )
+
+  if (hasMatchingRegions) {
+    for (const id of regions) {
+      const region = document.querySelector<HTMLElement>(id)
+      const newRegion = newDocument.querySelector<HTMLElement>(id)
+      if (!region || !newRegion) continue
       const strategy = getMergeStrategy(region, newRegion)
       const result = merge(region, newRegion, strategy as MergeStrategy)
       // Use the auto-focusable element from the first region that has one.
@@ -108,15 +109,4 @@ export const visit = async (
   else if (action === 'push') history.pushState(null, '', url)
 
   if (emitEvents) emit('visit', { url, prevUrl })
-}
-
-const findRegions = (doc: Document) => {
-  let regions: Regions = new Map()
-
-  doc.querySelectorAll<HTMLElement>('[data-simple-ajax]').forEach((el) => {
-    if (!el.id) console.warn(`Ajax region is missing an id:`, el)
-    else regions.set(el.id, el)
-  })
-
-  return regions
 }

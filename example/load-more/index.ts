@@ -4,7 +4,7 @@ import ajax from '../../src'
 registerComponent('load-more', ({ el }) => {
   el.addEventListener('click', async (e) => {
     e.preventDefault()
-    ajax.visit(el.getAttribute('href')!)
+    ajax.visit(el.getAttribute('href')!, { regions: ['#posts', '#load-more'] })
   })
 })
 
