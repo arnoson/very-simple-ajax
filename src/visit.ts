@@ -37,9 +37,6 @@ export const visit = async (
     regions = [],
   }: VisitOptions = {}
 ) => {
-  prevUrl = currentUrl
-  currentUrl = url
-
   if (emitEvents) emit('before-visit', { url, prevUrl })
 
   let newDocument: Document | undefined
@@ -55,12 +52,22 @@ export const visit = async (
   if (!newDocument) {
     const options = { loadingDelay, progressHideDelay, request }
     const result = await load(url, regions, options)
-    if (result) ({ url, document: newDocument } = result)
+    if (result) {
+      newDocument = result.document
+      // Only use the response url if there has been a redirect. Otherwise we
+      // might strip away the original url's hash.
+      url = result.response.redirected ? result.response.url : url
+    }
   }
 
   // Only an aborted fetch would return an empty document, all other errors
   // in `load()` trigger a reload.
   if (!newDocument) return
+
+  // Update currentUrl to the final URL (after potential redirect and
+  // hash handling).
+  prevUrl = currentUrl
+  currentUrl = url
 
   if (emitEvents) emit('before-render', { url, prevUrl, newDocument })
 

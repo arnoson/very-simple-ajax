@@ -9,7 +9,7 @@ export const load = async (
   url: string,
   regions: string[],
   options: LoadingOptions
-): Promise<{ document: Document; url: string } | undefined> => {
+): Promise<{ document: Document; response: Response } | undefined> => {
   let progressDelayTimeout: number | undefined
 
   try {
@@ -39,7 +39,7 @@ export const load = async (
 
     const html = await response.text()
     const document = parser.parseFromString(html, 'text/html')
-    return { document, url: response.url }
+    return { document, response }
   } catch (e) {
     setProgress(0)
     const isAbortError = e instanceof DOMException && e.name === 'AbortError'
