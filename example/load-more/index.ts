@@ -1,14 +1,19 @@
-import { registerComponent, mountComponents } from '@very-simple/components'
+import { component, mount, useEl } from '@very-simple/components'
+import { useEventListener } from '@very-simple/components/use'
 import ajax from '../../src'
 
-registerComponent('load-more', ({ el }) => {
-  el.addEventListener('click', async (e) => {
+component('load-more', () => {
+  const el = useEl<HTMLAnchorElement>()
+
+  useEventListener(el, 'click', (e) => {
     e.preventDefault()
-    ajax.visit(el.getAttribute('href')!, { regions: ['#posts', '#load-more'] })
+    const url = el.value?.getAttribute('href')
+    if (!url) return
+    ajax.visit(url, { regions: ['#posts', '#load-more'] })
   })
 })
 
-const initPage = () => mountComponents()
+const initPage = () => mount()
 document.addEventListener('simple-ajax:visit', initPage)
 
 ajax.start()

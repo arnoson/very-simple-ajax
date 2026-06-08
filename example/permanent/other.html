@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-head-script-count="0" data-body-script-count="0">
   <head>
     <meta charset="UTF-8" />
@@ -15,18 +15,25 @@
     <nav>
       <ul>
         <li>
-          <a
-            id="link"
-            data-simple-component="link"
-            href="/example/permanent/index.html"
-          >
+          <a id="link" #component="link" href="/example/permanent/index.html">
             Home
           </a>
         </li>
       </ul>
     </nav>
 
+    <div
+      #component="interval"
+      id="interval"
+      data-simple-permanent
+      #text="count"
+    ></div>
+
+    <div #component="counter">
+      <span #text="count"></span>
+      <button @click="count++">+</button>
+    </div>
+
     <h1 id="heading">Other</h1>
-    <input type="range" id="slider" data-simple-permanent />
   </body>
 </html>

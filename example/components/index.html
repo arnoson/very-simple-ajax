@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en" data-head-script-count="0" data-body-script-count="0">
   <head>
     <meta charset="UTF-8" />
@@ -15,12 +15,12 @@
     <nav>
       <ul>
         <li>
-          <a data-simple-component="link" href="/example/components/no.html">
+          <a #component="link" href="/example/components/no.html">
             No Component
           </a>
         </li>
         <li>
-          <a data-simple-component="link" href="/example/components/other.html">
+          <a #component="link" href="/example/components/other.html">
             Another Component
           </a>
         </li>
@@ -28,9 +28,9 @@
     </nav>
 
     <h1 id="heading">Component</h1>
-    <div id="div" data-simple-component="counter">
-      <span data-ref="count">0</span>
-      <button data-ref="addOne">Add One</button>
+    <div id="div" #component="counter">
+      <span #text="count">0</span>
+      <button @click="count++">Add One</button>
     </div>
   </body>
 </html>

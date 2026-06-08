@@ -1,38 +1,57 @@
 import { MergeStrategy } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
+import { unmount, mount } from '@very-simple/components'
 
 export const merge = (
   region: HTMLElement,
   newRegion: HTMLElement,
-  strategy: MergeStrategy
+  strategy: MergeStrategy,
 ): { autoFocusEl: HTMLElement | undefined } => {
   let autoFocusEl: HTMLElement | undefined
 
-  if (strategy === 'replace') {
-    region.replaceWith(newRegion)
+  if (strategy === 'replace' || strategy === 'update') {
+    // Extract permanents before unmounting so their components stay alive.
+    const permanents = new Map<string, Element>()
+    newRegion.querySelectorAll('[data-simple-permanent][id]').forEach((el) => {
+      const original = region.querySelector(`#${el.id}`)
+      if (original) {
+        permanents.set(el.id, original)
+        original.remove()
+        console.log('original', original)
+      }
+    })
+
+    unmount(region)
+
+    if (strategy === 'replace') region.replaceWith(newRegion)
+    else region.replaceChildren(...Array.from(newRegion.children))
+
+    // Re-insert permanents into the new content.
+    newRegion.querySelectorAll('[data-simple-permanent][id]').forEach((el) => {
+      const original = permanents.get(el.id)
+      if (original) el.replaceWith(original)
+    })
+
+    mount(strategy === 'replace' ? newRegion : region)
   } else if (strategy === 'before') {
     region.insertAdjacentElement('beforebegin', newRegion)
+    mount(newRegion)
   } else if (strategy === 'after') {
     region.insertAdjacentElement('afterend', newRegion)
+    mount(newRegion)
   } else if (strategy === 'prepend') {
     region.insertAdjacentElement('afterbegin', newRegion)
+    mount(newRegion)
   } else if (strategy === 'append') {
     region.insertAdjacentElement('beforeend', newRegion)
-  } else if (strategy === 'update') {
-    region.replaceChildren(...Array.from(newRegion.children))
+    mount(newRegion)
   } else if (strategy === 'morph') {
     const result = morph(region, newRegion)
     autoFocusEl = result.autoFocusEl
   }
 
-  // Morph already replaced any permanent elements.
-  if (strategy !== 'morph') {
-    newRegion.querySelectorAll('[data-simple-permanent][id]').forEach((el) => {
-      const originalEL = region.querySelector(`#${el.id}`)
-      if (originalEL) el.replaceWith(originalEL)
-    })
-  }
+  // Morph already replaced any permanent elements; replace/update handled above.
 
   // Find the first auto focus element, where [data-simple-autofocus] wins over
   // [autofocus]. First test the new region itself ...
@@ -73,21 +92,38 @@ const morph = (container: Element, newContainer: Element) => {
         )
           return false
 
-        // Each node could be a Very Simple Component that attached event
-        // listeners to itself or its children. In this case we have to replace
-        // the nodes manually instead of morphing in order to cleanup the
-        // listeners.
-        const oldComponent = oldNode.dataset.simpleComponent
-        const newComponent = newNode.dataset.simpleComponent
+        // Each node could be a Very Simple Component. If the component type
+        // changes we replace manually to properly unmount the old component.
+        const isOldComponent = oldNode.hasAttribute('#component')
+        const isNewComponent = newNode.hasAttribute('#component')
+        const isSameComponent =
+          isOldComponent &&
+          isNewComponent &&
+          oldNode.getAttribute('#component') ===
+            newNode.getAttribute('#component')
 
-        // Nothing to clean up, if the old node isn't a component are both nodes
+        // Nothing to clean up if the old node isn't a component or both nodes
         // are the same component.
-        if (!oldComponent || oldComponent === newComponent) return true
+        if (!isOldComponent || isSameComponent) return true
 
         manualReplacements.push([oldNode, newNode])
       },
       beforeAttributeUpdated: (name: string) => {
         return !currentNodeKeepAttributes.includes(name)
+      },
+      beforeNodeRemoved(node: Node) {
+        if (
+          node instanceof HTMLElement &&
+          !node.hasAttribute('data-simple-permanent')
+        ) {
+          unmount(node)
+        }
+        return true
+      },
+      afterNodeAdded(node: Node) {
+        if (node instanceof HTMLElement && node.hasAttribute('#component')) {
+          mount(node)
+        }
       },
       afterNodeMorphed(_: Node, newNode: Node) {
         if (
@@ -100,7 +136,11 @@ const morph = (container: Element, newContainer: Element) => {
     },
   })
 
-  for (const [oldEl, newEl] of manualReplacements) oldEl.replaceWith(newEl)
+  for (const [oldEl, newEl] of manualReplacements) {
+    unmount(oldEl)
+    oldEl.replaceWith(newEl)
+    mount(newEl)
+  }
 
   // Find the first auto focus element, where [data-simple-autofocus] wins over
   // [autofocus].

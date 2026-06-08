@@ -1,13 +1,17 @@
-import { mountComponents } from '@very-simple/components'
-import './link'
-import './counter'
+import { component, mount, signal } from '@very-simple/components'
+import { useInterval } from '@very-simple/components/use'
 import ajax from '../src'
+import './counter'
+import './link'
 
-const initPage = () => mountComponents()
-document.addEventListener('simple-ajax:visit', initPage)
+component('interval', () => {
+  let count = signal(0)
+  useInterval(() => count.value++, 1000)
+  return { count }
+})
 
 ajax.start()
-initPage()
+mount()
 
 // This is only needed for testing.
 // @ts-ignore
