@@ -23,7 +23,7 @@
   "devDependencies": {
     "@picocss/pico": "^2.0.6",
     "@playwright/test": "^1.48.2",
-    "@types/node": "^22.0",
+    "@types/node": "^22.19.20",
     "bumpp": "^10.0.0",
     "tsup": "8",
     "typescript": "^5",

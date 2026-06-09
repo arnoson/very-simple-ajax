@@ -3,7 +3,8 @@
     "lib": ["ESNext", "dom"],
     "moduleResolution": "bundler",
     "target": "ESNext",
-    "strict": true
+    "strict": true,
+    "types": ["node"]
   },
   "include": ["src/**/*"],
   "exclude": ["dist"]

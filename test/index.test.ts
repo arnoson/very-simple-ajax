@@ -1,5 +1,4 @@
 import { expect, test } from '@playwright/test'
-import { randomBytes } from 'node:crypto'
 
 test('page visit works', async ({ page }) => {
   await page.goto('/example/index.html')
@@ -19,18 +18,18 @@ test('permanent elements are kept alive', async ({ page }) => {
 
   // I haven't found a way to assert if two DOM nodes are the same. As a
   // workaround a random hash is created at runtime to identify the DOM node.
-  const hash = randomBytes(20).toString('hex')
+  const hash = crypto.getRandomValues(new Uint8Array(20)).join('')
 
   await page.evaluate((hash) => {
     // @ts-ignore
-    document.querySelector<HTMLElement>('#slider')!.$hash = hash
+    document.querySelector<HTMLElement>('#interval')!.$hash = hash
   }, hash)
 
   await page.locator("a[href='/example/permanent/other.html']").click()
 
   const newHash = await page.evaluate(
     // @ts-ignore
-    () => document.querySelector<HTMLElement>('#slider')!.$hash
+    () => document.querySelector<HTMLElement>('#interval')!.$hash,
   )
 
   expect(newHash).toBe(hash)
@@ -40,7 +39,7 @@ test('manual navigation works', async ({ page }) => {
   await page.goto('/example/index.html')
   await page.evaluate(() =>
     // @ts-ignore
-    window.ajax.visit('/example/about.html', { action: 'push' })
+    window.ajax.visit('/example/about.html', { action: 'push' }),
   )
   await expect(page).toHaveURL('/example/about.html')
 })
