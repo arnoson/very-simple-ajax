@@ -65,7 +65,7 @@ export const merge = (
 }
 
 const morph = (container: Element, newContainer: Element) => {
-  const manualReplacements: [HTMLElement, HTMLElement][] = []
+  const manualReplacements: [Element, Element][] = []
   let autoFocusEls: HTMLElement[] = []
 
   // A list of attributes we want to keep unmodified/unremoved during the morph.
@@ -74,10 +74,10 @@ const morph = (container: Element, newContainer: Element) => {
   Idiomorph.morph(container, newContainer, {
     callbacks: {
       beforeNodeMorphed(oldNode: Node, newNode: Node) {
-        // All following checks use dataset, which is only available on
-        // HTMLElements.
-        if (!(oldNode instanceof HTMLElement)) return true
-        if (!(newNode instanceof HTMLElement)) return true
+        // All following checks use attributes, which are only available on
+        // Elements.
+        if (!(oldNode instanceof Element)) return true
+        if (!(newNode instanceof Element)) return true
 
         currentNodeKeepAttributes =
           oldNode.getAttribute('#keep-attributes')?.split(' ') ?? []
@@ -109,16 +109,13 @@ const morph = (container: Element, newContainer: Element) => {
         return !currentNodeKeepAttributes.includes(name)
       },
       beforeNodeRemoved(node: Node) {
-        if (
-          node instanceof HTMLElement &&
-          !node.hasAttribute('#ajax-permanent')
-        ) {
+        if (node instanceof Element && !node.hasAttribute('#ajax-permanent')) {
           unmount(node)
         }
         return true
       },
       afterNodeAdded(node: Node) {
-        if (node instanceof HTMLElement && node.hasAttribute('#component')) {
+        if (node instanceof Element && node.hasAttribute('#component')) {
           mount(node)
         }
       },
