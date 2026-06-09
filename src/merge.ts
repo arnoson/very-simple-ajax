@@ -50,8 +50,6 @@ export const merge = (
     autoFocusEl = result.autoFocusEl
   }
 
-  // Morph already replaced any permanent elements; replace/update handled above.
-
   // Find the first auto focus element, where [#ajax-autofocus] wins over
   // [autofocus]. First test the new region itself ...
   if (newRegion.hasAttribute('#ajax-autofocus') || newRegion.autofocus) {
@@ -93,17 +91,17 @@ const morph = (container: Element, newContainer: Element) => {
 
         // Each node could be a Very Simple Component. If the component type
         // changes we replace manually to properly unmount the old component.
-        const isOldComponent = oldNode.hasAttribute('#component')
-        const isNewComponent = newNode.hasAttribute('#component')
+        const oldIsComponent = oldNode.hasAttribute('#component')
+        const newIsComponent = newNode.hasAttribute('#component')
         const isSameComponent =
-          isOldComponent &&
-          isNewComponent &&
+          oldIsComponent &&
+          newIsComponent &&
           oldNode.getAttribute('#component') ===
             newNode.getAttribute('#component')
 
         // Nothing to clean up if the old node isn't a component or both nodes
         // are the same component.
-        if (!isOldComponent || isSameComponent) return true
+        if (!oldIsComponent || isSameComponent) return true
 
         manualReplacements.push([oldNode, newNode])
       },
