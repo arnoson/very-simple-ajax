@@ -13,12 +13,11 @@ export const merge = (
   if (strategy === 'replace' || strategy === 'update') {
     // Extract permanents before unmounting so their components stay alive.
     const permanents = new Map<string, Element>()
-    newRegion.querySelectorAll('[data-simple-permanent][id]').forEach((el) => {
+    newRegion.querySelectorAll('[\\#ajax-permanent][id]').forEach((el) => {
       const original = region.querySelector(`#${el.id}`)
       if (original) {
         permanents.set(el.id, original)
         original.remove()
-        console.log('original', original)
       }
     })
 
@@ -28,7 +27,7 @@ export const merge = (
     else region.replaceChildren(...Array.from(newRegion.children))
 
     // Re-insert permanents into the new content.
-    newRegion.querySelectorAll('[data-simple-permanent][id]').forEach((el) => {
+    newRegion.querySelectorAll('[\\#ajax-permanent][id]').forEach((el) => {
       const original = permanents.get(el.id)
       if (original) el.replaceWith(original)
     })
@@ -53,14 +52,14 @@ export const merge = (
 
   // Morph already replaced any permanent elements; replace/update handled above.
 
-  // Find the first auto focus element, where [data-simple-autofocus] wins over
+  // Find the first auto focus element, where [#ajax-autofocus] wins over
   // [autofocus]. First test the new region itself ...
-  if (newRegion.hasAttribute('data-simple-autofocus') || newRegion.autofocus) {
+  if (newRegion.hasAttribute('#ajax-autofocus') || newRegion.autofocus) {
     autoFocusEl ??= newRegion
   }
   // ... then look into it's children.
   autoFocusEl ??=
-    newRegion.querySelector<HTMLElement>('[data-simple-autofocus]') ??
+    newRegion.querySelector<HTMLElement>('[\\#ajax-autofocus]') ??
     newRegion.querySelector<HTMLElement>('[autofocus]') ??
     undefined
 
@@ -83,11 +82,11 @@ const morph = (container: Element, newContainer: Element) => {
         if (!(newNode instanceof HTMLElement)) return true
 
         currentNodeKeepAttributes =
-          oldNode.dataset.simpleKeepAttributes?.split(' ') ?? []
+          oldNode.getAttribute('#keep-attributes')?.split(' ') ?? []
 
         // Check if the old node is permanent and the new one is matching.
         if (
-          oldNode.hasAttribute('data-simple-permanent') &&
+          oldNode.hasAttribute('#ajax-permanent') &&
           oldNode.id === newNode.id
         )
           return false
@@ -114,7 +113,7 @@ const morph = (container: Element, newContainer: Element) => {
       beforeNodeRemoved(node: Node) {
         if (
           node instanceof HTMLElement &&
-          !node.hasAttribute('data-simple-permanent')
+          !node.hasAttribute('#ajax-permanent')
         ) {
           unmount(node)
         }
@@ -142,7 +141,7 @@ const morph = (container: Element, newContainer: Element) => {
     mount(newEl)
   }
 
-  // Find the first auto focus element, where [data-simple-autofocus] wins over
+  // Find the first auto focus element, where [#ajax-autofocus] wins over
   // [autofocus].
   const autoFocusEl =
     autoFocusEls.find((el) => el.dataset.simpleAutofocus) ??

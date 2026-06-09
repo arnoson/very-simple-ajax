@@ -9,7 +9,7 @@
   transition: width 300ms ease-out;
   background-color: red;
 
-  :root:not([data-simple-progress]) & {
+  :root:not([data-ajax-progress]) & {
     display: none;
   }
 }

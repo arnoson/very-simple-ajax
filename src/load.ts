@@ -8,7 +8,7 @@ let trickleInterval: number | undefined
 export const load = async (
   url: string,
   regions: string[],
-  options: LoadingOptions
+  options: LoadingOptions,
 ): Promise<{ document: Document; response: Response } | undefined> => {
   let progressDelayTimeout: number | undefined
 
@@ -70,12 +70,12 @@ const setProgress = (value: number) => {
   progress = value
   document.documentElement.style.setProperty(
     '--simple-progress',
-    `${Math.round(value * 10000) / 100}%`
+    `${Math.round(value * 10000) / 100}%`,
   )
 }
 
 const toggleProgress = (state: boolean) =>
-  document.documentElement.toggleAttribute('data-simple-progress', state)
+  document.documentElement.toggleAttribute('data-ajax-progress', state)
 
 const toggleLoading = (state: boolean) =>
   document.documentElement.toggleAttribute('data-simple-loading', state)

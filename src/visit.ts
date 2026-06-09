@@ -9,7 +9,7 @@ export const cache = new Map<string, Document>()
 
 const emit = async <E extends keyof EventMap>(
   type: E,
-  payload: EventMap[E]
+  payload: EventMap[E],
 ) => {
   const event = new CustomEvent(`simple-ajax:${type}`, { detail: payload })
   document.dispatchEvent(event)
@@ -35,7 +35,7 @@ export const visit = async (
     autoFocus = true,
     request,
     regions = [],
-  }: VisitOptions = {}
+  }: VisitOptions = {},
 ) => {
   if (emitEvents) emit('before-visit', { url, prevUrl })
 
@@ -83,13 +83,15 @@ export const visit = async (
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
-    newEl.dataset.simpleMerge || oldEl.dataset.simpleMerge || mergeStrategy
+    newEl.getAttribute('#ajax-merge') ||
+    oldEl.getAttribute('#ajax-merge') ||
+    mergeStrategy
 
   let autoFocusEl: HTMLElement | undefined
 
   const hasMatchingRegions = regions?.some(
     (selector) =>
-      document.querySelector(selector) && newDocument.querySelector(selector)
+      document.querySelector(selector) && newDocument.querySelector(selector),
   )
 
   if (hasMatchingRegions) {
