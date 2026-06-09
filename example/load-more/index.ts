@@ -14,7 +14,7 @@ component('load-more', () => {
 })
 
 const initPage = () => mount()
-document.addEventListener('simple-ajax:visit', initPage)
+document.addEventListener('ajax:visit', initPage)
 
 ajax.start()
 initPage()

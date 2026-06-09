@@ -31,8 +31,8 @@ export const load = async (
       ...options.request,
       headers: {
         ...options.request?.headers,
-        'X-Very-Simple-Request': 'true',
-        'X-Very-Simple-Regions': regions.join(' '),
+        'X-Very-Simple-Ajax': 'true',
+        'X-Very-Simple-Ajax-Regions': regions.join(' '),
       },
       signal: currentLoadController.signal,
     })
@@ -69,7 +69,7 @@ const stopTrickle = () => clearInterval(trickleInterval)
 const setProgress = (value: number) => {
   progress = value
   document.documentElement.style.setProperty(
-    '--simple-progress',
+    '--ajax-progress',
     `${Math.round(value * 10000) / 100}%`,
   )
 }
@@ -78,4 +78,4 @@ const toggleProgress = (state: boolean) =>
   document.documentElement.toggleAttribute('data-ajax-progress', state)
 
 const toggleLoading = (state: boolean) =>
-  document.documentElement.toggleAttribute('data-simple-loading', state)
+  document.documentElement.toggleAttribute('data-ajax-loading', state)

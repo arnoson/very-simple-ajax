@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   height: 3px;
-  width: var(--simple-progress);
+  width: var(--ajax-progress);
   transition: width 300ms ease-out;
   background-color: red;
 

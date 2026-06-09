@@ -45,7 +45,7 @@ export type SimpleBeforeVisitEvent = CustomEvent<EventMap['before-visit']>
 export type SimpleBeforeRenderEvent = CustomEvent<EventMap['before-render']>
 
 type DomEventMap = {
-  [K in keyof EventMap as `simple-ajax:${K & string}`]: CustomEvent<EventMap[K]>
+  [K in keyof EventMap as `ajax:${K & string}`]: CustomEvent<EventMap[K]>
 }
 
 declare global {
