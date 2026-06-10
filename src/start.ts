@@ -21,4 +21,14 @@ export const start = ({
       })
     })
   }
+
+  if (import.meta.env.DEV) {
+    document.addEventListener('ajax:before-visit', () => {
+      // Vite adds styles during dev dynamically which would be removed when
+      // idiomorph morphs the document's heads.
+      document.head
+        .querySelectorAll('style[data-vite-dev-id]')
+        .forEach((el) => el.setAttribute('im-preserve', 'true'))
+    })
+  }
 }
