@@ -1,15 +1,13 @@
-export interface VisitOptions {
+export interface VisitOptions extends Omit<Config, 'watchHistory'> {
   action?: 'push' | 'replace' | 'none'
   emitEvents?: boolean
   isBackForward?: boolean
-  merge?: MergeStrategy
-  morphHeads?: boolean
   autoFocus?: boolean
-  loadingDelay?: number
-  progressHideDelay?: number
   request?: RequestInit
   regions?: string[]
 }
+
+export type StartOptions = Config
 
 export interface LoadingOptions {
   loadingDelay?: number
@@ -30,6 +28,7 @@ export interface Config {
   watchHistory?: boolean
   merge?: MergeStrategy
   morphHeads?: boolean
+  viewTransitions?: boolean
   loadingDelay?: number
   progressHideDelay?: number
 }
