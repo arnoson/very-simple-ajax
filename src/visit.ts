@@ -1,4 +1,4 @@
-import { globalConfig } from './config'
+import { config } from './config'
 import { load } from './load'
 import { merge } from './merge'
 import { EventMap, MergeStrategy, VisitOptions } from './types'
@@ -19,7 +19,7 @@ let currentUrl = window.location.pathname
 let prevUrl: string | undefined
 
 /**
- * Load a new page, merge the containers/bodies and add a new history entry
+ * Load a new page, merge the regions/bodies and add a new history entry
  * according to the action.
  */
 export const visit = async (
@@ -28,13 +28,14 @@ export const visit = async (
     action = 'none',
     emitEvents = true,
     isBackForward = false,
-    morphHeads = globalConfig.morphHeads,
-    merge: mergeStrategy = globalConfig.merge,
-    loadingDelay = globalConfig.loadingDelay,
-    progressHideDelay = globalConfig.progressHideDelay,
     autoFocus = true,
     request,
     regions = [],
+    morphHeads = config.morphHeads,
+    merge: mergeStrategy = config.merge,
+    viewTransitions = config.viewTransitions,
+    loadingDelay = config.loadingDelay,
+    progressHideDelay = config.progressHideDelay,
   }: VisitOptions = {},
 ) => {
   if (emitEvents) emit('before-visit', { url, prevUrl })
@@ -94,22 +95,30 @@ export const visit = async (
       document.querySelector(selector) && newDocument.querySelector(selector),
   )
 
-  if (hasMatchingRegions) {
-    for (const id of regions) {
-      const region = document.querySelector<HTMLElement>(id)
-      const newRegion = newDocument.querySelector<HTMLElement>(id)
-      if (!region || !newRegion) continue
+  const mergeRegions = () => {
+    if (hasMatchingRegions) {
+      for (const id of regions) {
+        const region = document.querySelector<HTMLElement>(id)
+        const newRegion = newDocument.querySelector<HTMLElement>(id)
+        if (!region || !newRegion) continue
+        const strategy = getMergeStrategy(region, newRegion)
+        const result = merge(region, newRegion, strategy as MergeStrategy)
+        // Use the auto-focusable element from the first region that has one.
+        autoFocusEl ??= result.autoFocusEl
+      }
+    } else {
+      const region = document.body
+      const newRegion = newDocument.body
       const strategy = getMergeStrategy(region, newRegion)
       const result = merge(region, newRegion, strategy as MergeStrategy)
-      // Use the auto-focusable element from the first region that has one.
-      autoFocusEl ??= result.autoFocusEl
+      autoFocusEl = result.autoFocusEl
     }
+  }
+
+  if (viewTransitions && document.startViewTransition) {
+    await document.startViewTransition(mergeRegions).ready
   } else {
-    const region = document.body
-    const newRegion = newDocument.body
-    const strategy = getMergeStrategy(region, newRegion)
-    const result = merge(region, newRegion, strategy as MergeStrategy)
-    autoFocusEl = result.autoFocusEl
+    mergeRegions()
   }
 
   if (autoFocus) autoFocusEl?.focus()
