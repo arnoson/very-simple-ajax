@@ -32,6 +32,8 @@ export interface Config {
   loadingDelay?: number
   progressHideDelay?: number
   prefix?: string
+  mount?: (el: Element) => void
+  unmount?: (el: Element) => void
 }
 
 export type EventMap = {

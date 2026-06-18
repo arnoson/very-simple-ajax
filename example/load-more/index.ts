@@ -1,4 +1,4 @@
-import { component, mount, useEl } from '@very-simple/components'
+import { component, mount, unmount, useEl } from '@very-simple/components'
 import { useEventListener } from '@very-simple/components/use'
 import ajax from '../../src'
 
@@ -16,5 +16,5 @@ component('load-more', () => {
 const initPage = () => mount()
 document.addEventListener('ajax:visit', initPage)
 
-ajax.start({ prefix: '#' })
+ajax.start({ mount, unmount, prefix: '#' })
 initPage()

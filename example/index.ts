@@ -1,4 +1,4 @@
-import { component, mount, signal } from '@very-simple/components'
+import { component, mount, unmount, signal } from '@very-simple/components'
 import { useInterval } from '@very-simple/components/use'
 import ajax from '../src'
 import './counter'
@@ -10,7 +10,7 @@ component('interval', () => {
   return { count }
 })
 
-ajax.start({ prefix: '#' })
+ajax.start({ mount, unmount, prefix: '#' })
 mount()
 
 // This is only needed for testing.

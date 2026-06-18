@@ -1,7 +1,6 @@
 import { MergeStrategy } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
-import { unmount, mount } from '@very-simple/components'
 import { config } from './config'
 
 export const merge = (
@@ -10,7 +9,7 @@ export const merge = (
   strategy: MergeStrategy,
 ): { autoFocusEl: HTMLElement | undefined } => {
   let autoFocusEl: HTMLElement | undefined
-  const { prefix } = config
+  const { prefix, mount, unmount } = config
   const escapedPrefix = CSS.escape(prefix)
 
   if (strategy === 'replace' || strategy === 'update') {
@@ -26,7 +25,7 @@ export const merge = (
       }
     })
 
-    unmount(region)
+    unmount?.(region)
 
     if (strategy === 'replace') region.replaceWith(newRegion)
     else region.replaceChildren(...Array.from(newRegion.children))
@@ -39,19 +38,19 @@ export const merge = (
       if (original) el.replaceWith(original)
     })
 
-    mount(strategy === 'replace' ? newRegion : region)
+    mount?.(strategy === 'replace' ? newRegion : region)
   } else if (strategy === 'before') {
     region.insertAdjacentElement('beforebegin', newRegion)
-    mount(newRegion)
+    mount?.(newRegion)
   } else if (strategy === 'after') {
     region.insertAdjacentElement('afterend', newRegion)
-    mount(newRegion)
+    mount?.(newRegion)
   } else if (strategy === 'prepend') {
     region.insertAdjacentElement('afterbegin', newRegion)
-    mount(newRegion)
+    mount?.(newRegion)
   } else if (strategy === 'append') {
     region.insertAdjacentElement('beforeend', newRegion)
-    mount(newRegion)
+    mount?.(newRegion)
   } else if (strategy === 'morph') {
     const result = morph(region, newRegion)
     autoFocusEl = result.autoFocusEl
@@ -75,7 +74,7 @@ export const merge = (
 }
 
 const morph = (container: Element, newContainer: Element) => {
-  const { prefix } = config
+  const { prefix, mount, unmount } = config
 
   const manualReplacements: [Element, Element][] = []
   let autoFocusEls: HTMLElement[] = []
@@ -125,7 +124,7 @@ const morph = (container: Element, newContainer: Element) => {
           node instanceof Element &&
           !node.hasAttribute(`${prefix}ajax-permanent`)
         ) {
-          unmount(node)
+          unmount?.(node)
         }
         return true
       },
@@ -134,7 +133,7 @@ const morph = (container: Element, newContainer: Element) => {
           node instanceof Element &&
           node.hasAttribute(`${prefix}component`)
         ) {
-          mount(node)
+          mount?.(node)
         }
       },
       afterNodeMorphed(_: Node, newNode: Node) {
@@ -149,9 +148,9 @@ const morph = (container: Element, newContainer: Element) => {
   })
 
   for (const [oldEl, newEl] of manualReplacements) {
-    unmount(oldEl)
+    unmount?.(oldEl)
     oldEl.replaceWith(newEl)
-    mount(newEl)
+    mount?.(newEl)
   }
 
   // Find the first auto focus element, where [#ajax-autofocus] wins over

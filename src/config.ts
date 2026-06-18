@@ -1,6 +1,9 @@
 import { Config } from './types'
 
-export const config: Required<Config> = {
+type InternalConfig = Required<Omit<Config, 'mount' | 'unmount'>> &
+  Pick<Config, 'mount' | 'unmount'>
+
+export const config: InternalConfig = {
   watchHistory: true,
   morphHeads: true,
   merge: 'replace',
