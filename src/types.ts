@@ -31,6 +31,7 @@ export interface Config {
   viewTransitions?: boolean
   loadingDelay?: number
   progressHideDelay?: number
+  prefix?: string
 }
 
 export type EventMap = {

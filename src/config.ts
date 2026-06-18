@@ -7,4 +7,5 @@ export const config: Required<Config> = {
   viewTransitions: false,
   loadingDelay: 500,
   progressHideDelay: 500,
+  prefix: 'data-',
 }

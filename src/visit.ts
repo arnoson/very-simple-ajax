@@ -84,8 +84,8 @@ export const visit = async (
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
-    newEl.getAttribute('#ajax-merge') ||
-    oldEl.getAttribute('#ajax-merge') ||
+    newEl.getAttribute(`${config.prefix}ajax-merge`) ||
+    oldEl.getAttribute(`${config.prefix}ajax-merge`) ||
     mergeStrategy
 
   let autoFocusEl: HTMLElement | undefined

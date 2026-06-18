@@ -10,7 +10,7 @@ component('interval', () => {
   return { count }
 })
 
-ajax.start()
+ajax.start({ prefix: '#' })
 mount()
 
 // This is only needed for testing.

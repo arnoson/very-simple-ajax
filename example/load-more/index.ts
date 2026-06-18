@@ -16,5 +16,5 @@ component('load-more', () => {
 const initPage = () => mount()
 document.addEventListener('ajax:visit', initPage)
 
-ajax.start()
+ajax.start({ prefix: '#' })
 initPage()
