@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -15,7 +19,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: lts/*
           registry-url: https://registry.npmjs.org/
 
       - name: Install
@@ -25,9 +29,7 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
 
       - run: npx changelogithub
         env:
