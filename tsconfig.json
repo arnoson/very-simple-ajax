@@ -4,7 +4,8 @@
     "moduleResolution": "bundler",
     "target": "ESNext",
     "strict": true,
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client"],
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*"],
   "exclude": ["dist"]

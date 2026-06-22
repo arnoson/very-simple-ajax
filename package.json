@@ -1,7 +1,7 @@
 {
   "name": "@very-simple/ajax",
   "version": "1.0.0-beta.1",
-  "description": "A very simple turbolinks inspired library",
+  "description": "A very simple turbolinks inspired ajax library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -16,6 +16,7 @@
     "build": "tsup src/index.ts --dts --format esm",
     "dev": "vite",
     "test": "playwright test",
+    "test:types": "tsc --noEmit",
     "release": "npm run build && npm run test && bumpp"
   },
   "author": "arnoson",
@@ -23,14 +24,14 @@
   "devDependencies": {
     "@picocss/pico": "^2.0.6",
     "@playwright/test": "^1.48.2",
-    "@types/node": "^22.19.20",
+    "@types/node": "^24",
     "bumpp": "^10.0.0",
     "tsup": "8",
-    "typescript": "^5",
-    "vite": "^6"
+    "typescript": "^6",
+    "vite": "^8",
+    "@very-simple/components": "file:../components-petite"
   },
   "dependencies": {
-    "@very-simple/components": "file:../components-petite",
     "idiomorph": "^0.7.0"
   }
 }
