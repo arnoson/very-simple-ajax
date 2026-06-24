@@ -6,10 +6,11 @@ export const start = (options: StartOptions = {}) => {
   Object.assign(config, options)
 
   if (config.watchHistory) {
-    window.addEventListener('popstate', () => {
-      visit(window.location.pathname + window.location.search, {
+    window.addEventListener('popstate', (event) => {
+      visit(window.location.href, {
         action: 'none',
         isBackForward: true,
+        regions: event.state?.regions ?? [],
       })
     })
   }

@@ -7,12 +7,38 @@ import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
 export const cache = new Map<string, Document>()
 
+const normalizeUrl = (url: string): string => {
+  try {
+    const urlObj = new URL(url, window.location.origin)
+    return urlObj.pathname + urlObj.search
+  } catch {
+    return url
+  }
+}
+
 const emit = async <E extends keyof EventMap>(
   type: E,
   payload: EventMap[E],
 ) => {
   const event = new CustomEvent(`ajax:${type}`, { detail: payload })
   document.dispatchEvent(event)
+}
+
+const emitAsync = async <E extends keyof EventMap>(
+  type: E,
+  payload: Omit<EventMap[E], 'waitUntil'>,
+) => {
+  const waiting: Promise<unknown>[] = []
+
+  const waitUntil = (promise: Promise<unknown>) =>
+    waiting.push(Promise.resolve(promise))
+
+  payload = { ...payload, waitUntil }
+  const event = new CustomEvent(`ajax:${type}`, { detail: payload })
+  document.dispatchEvent(event)
+
+  if (!waiting.length) return
+  await Promise.allSettled(waiting)
 }
 
 let currentUrl = window.location.pathname
@@ -38,6 +64,12 @@ export const visit = async (
     progressHideDelay = config.progressHideDelay,
   }: VisitOptions = {},
 ) => {
+  url = normalizeUrl(url)
+
+  // Mimic browser behavior: navigating to the already-active URL should not
+  // create a new history entry.
+  if (url === currentUrl) action = 'none'
+
   if (emitEvents) emit('before-visit', { url, prevUrl })
 
   let newDocument: Document | undefined
@@ -70,16 +102,21 @@ export const visit = async (
   prevUrl = currentUrl
   currentUrl = url
 
-  if (emitEvents) emit('before-render', { url, prevUrl, newDocument })
+  const state = { regions }
+  if (action === 'replace') history.replaceState(state, '', url)
+  else if (action === 'push') history.pushState(state, '', url)
+
+  // To keep things simple, most events aren't async, but before rendering we
+  // might want to finish some animation like collapsing a menu, etc.
+  if (emitEvents) {
+    await emitAsync('before-render', { url, prevUrl, newDocument })
+  }
 
   // Cache the previous document for future back/forward navigation. We do this
   // after the before-render event is dispatched so we can prepare the previous
   // document for caching (e.g. changing the DOM) while already having access
   // to the new document.
-  if (!isBackForward) {
-    const cacheId = window.location.pathname + window.location.search
-    cache.set(cacheId, document.cloneNode(true) as Document)
-  }
+  if (!isBackForward) cache.set(prevUrl!, document.cloneNode(true) as Document)
 
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
@@ -122,9 +159,5 @@ export const visit = async (
   }
 
   if (autoFocus) autoFocusEl?.focus()
-
-  if (action === 'replace') history.replaceState(null, '', url)
-  else if (action === 'push') history.pushState(null, '', url)
-
   if (emitEvents) emit('visit', { url, prevUrl })
 }

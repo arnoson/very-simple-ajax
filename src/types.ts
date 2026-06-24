@@ -39,7 +39,12 @@ export interface Config {
 export type EventMap = {
   visit: { url: string; prevUrl: string }
   'before-visit': { url: string; prevUrl?: string }
-  'before-render': { url: string; prevUrl?: string; newDocument: Document }
+  'before-render': {
+    url: string
+    prevUrl?: string
+    newDocument: Document
+    waitUntil: (promise: Promise<unknown>) => void
+  }
 }
 
 export type SimpleVisitEvent = CustomEvent<EventMap['visit']>

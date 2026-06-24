@@ -13,6 +13,42 @@ test('page visit works', async ({ page }) => {
   await expect(page).toHaveURL('/example/index.html')
 })
 
+test('before-render can delay dom swap', async ({ page }) => {
+  await page.goto('/example/index.html')
+
+  await page.evaluate(() => {
+    let resumeRender: (() => void) | undefined
+
+    // @ts-ignore
+    window.resumeRender = () => resumeRender?.()
+
+    document.addEventListener('ajax:before-render', (event) => {
+      const customEvent = event as CustomEvent<{
+        waitUntil: (promise: Promise<unknown>) => void
+      }>
+
+      customEvent.detail.waitUntil(
+        new Promise<void>((resolve) => {
+          resumeRender = resolve
+        }),
+      )
+    })
+  })
+
+  await page.locator("a[href='/example/about.html']").click()
+
+  await expect(page).toHaveURL('/example/index.html')
+  await expect(page.locator('#heading')).toHaveText('Home')
+
+  await page.evaluate(
+    // @ts-ignore
+    () => window.resumeRender(),
+  )
+
+  await expect(page).toHaveURL('/example/about.html')
+  await expect(page.locator('h1')).toHaveText('About')
+})
+
 test('permanent elements are kept alive', async ({ page }) => {
   await page.goto('/example/permanent/index.html')
 
