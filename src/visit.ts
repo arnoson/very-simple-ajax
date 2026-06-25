@@ -65,12 +65,13 @@ export const visit = async (
   }: VisitOptions = {},
 ) => {
   url = normalizeUrl(url)
+  const fromUrl = currentUrl
 
   // Mimic browser behavior: navigating to the already-active URL should not
   // create a new history entry.
   if (url === currentUrl) action = 'none'
 
-  if (emitEvents) emit('before-visit', { url, prevUrl })
+  if (emitEvents) emit('before-visit', { url, prevUrl: fromUrl })
 
   let newDocument: Document | undefined
 
@@ -99,7 +100,7 @@ export const visit = async (
 
   // Update currentUrl to the final URL (after potential redirect and
   // hash handling).
-  prevUrl = currentUrl
+  prevUrl = fromUrl
   currentUrl = url
 
   const state = { regions }
