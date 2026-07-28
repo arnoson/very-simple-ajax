@@ -29,6 +29,7 @@ export interface Config {
   merge?: MergeStrategy
   morphHeads?: boolean
   viewTransitions?: boolean
+  render?: (newDocument: Document) => Promise<void> | void
   loadingDelay?: number
   progressHideDelay?: number
   prefix?: string

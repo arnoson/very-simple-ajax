@@ -159,7 +159,9 @@ export const visit = async (
     }
   }
 
-  if (viewTransitions && document.startViewTransition) {
+  if (config.render) {
+    await config.render(newDocument)
+  } else if (viewTransitions && document.startViewTransition) {
     await document.startViewTransition(mergeRegions).ready
   } else {
     mergeRegions()
