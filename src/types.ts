@@ -43,6 +43,7 @@ export type EventMap = {
     url: string
     prevUrl?: string
     newDocument: Document
+    signal: AbortSignal
     waitUntil: (promise: Promise<unknown>) => void
   }
 }

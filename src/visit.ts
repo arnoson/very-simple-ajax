@@ -43,6 +43,7 @@ const emitAsync = async <E extends keyof EventMap>(
 
 let currentUrl = window.location.pathname
 let prevUrl: string | undefined
+let currentVisitController: AbortController | undefined
 
 /**
  * Load a new page, merge the regions/bodies and add a new history entry
@@ -66,6 +67,10 @@ export const visit = async (
 ) => {
   url = normalizeUrl(url)
   const fromUrl = currentUrl
+
+  currentVisitController?.abort()
+  currentVisitController = new AbortController()
+  const { signal } = currentVisitController
 
   // Mimic browser behavior: navigating to the already-active URL should not
   // create a new history entry.
@@ -110,7 +115,8 @@ export const visit = async (
   // To keep things simple, most events aren't async, but before rendering we
   // might want to finish some animation like collapsing a menu, etc.
   if (emitEvents) {
-    await emitAsync('before-render', { url, prevUrl, newDocument })
+    await emitAsync('before-render', { url, prevUrl, newDocument, signal })
+    if (signal.aborted) return
   }
 
   // Cache the previous document for future back/forward navigation. We do this
