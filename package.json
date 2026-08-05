@@ -28,8 +28,7 @@
     "bumpp": "^10.0.0",
     "tsup": "8",
     "typescript": "^6",
-    "vite": "^8",
-    "@very-simple/components": "file:../components-petite"
+    "vite": "^8"
   },
   "dependencies": {
     "idiomorph": "^0.7.0"

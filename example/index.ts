@@ -1,5 +1,5 @@
-import { component, mount, unmount, signal } from '@very-simple/components'
-import { useInterval } from '@very-simple/components/use'
+import { component, mount, unmount, signal } from '@very-simple/framework'
+import { useInterval } from '@very-simple/framework/use'
 import ajax from '../src'
 import './counter'
 import './link'

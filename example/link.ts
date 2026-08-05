@@ -1,5 +1,5 @@
-import { component, useEl } from '@very-simple/components'
-import { useEventListener } from '@very-simple/components/use'
+import { component, useEl } from '@very-simple/framework'
+import { useEventListener } from '@very-simple/framework/use'
 import ajax from '../src'
 
 export default component('link', () => {

@@ -1,5 +1,5 @@
-import { component, mount, unmount, useEl } from '@very-simple/components'
-import { useEventListener } from '@very-simple/components/use'
+import { component, mount, unmount, useEl } from '@very-simple/framework'
+import { useEventListener } from '@very-simple/framework/use'
 import ajax from '../../src'
 
 component('load-more', () => {
