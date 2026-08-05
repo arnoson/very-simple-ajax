@@ -76,7 +76,7 @@ export const visit = async (
   // create a new history entry.
   if (url === currentUrl) action = 'none'
 
-  if (emitEvents) emit('before-visit', { url, prevUrl: fromUrl })
+  if (emitEvents) emit('before-visit', { url, prevUrl: fromUrl, isBackForward })
 
   let newDocument: Document | undefined
 
@@ -115,7 +115,13 @@ export const visit = async (
   // To keep things simple, most events aren't async, but before rendering we
   // might want to finish some animation like collapsing a menu, etc.
   if (emitEvents) {
-    await emitAsync('before-render', { url, prevUrl, newDocument, signal })
+    await emitAsync('before-render', {
+      url,
+      prevUrl,
+      newDocument,
+      signal,
+      isBackForward,
+    })
     if (signal.aborted) return
   }
 
@@ -184,7 +190,7 @@ export const visit = async (
   }
 
   if (autoFocus) autoFocusEl?.focus()
-  if (emitEvents) emit('visit', { url, prevUrl })
+  if (emitEvents) emit('visit', { url, prevUrl, isBackForward })
 }
 
 const supportsViewTransitions = 'startViewTransition' in document

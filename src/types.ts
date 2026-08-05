@@ -38,13 +38,14 @@ export interface Config {
 }
 
 export type EventMap = {
-  visit: { url: string; prevUrl: string }
-  'before-visit': { url: string; prevUrl?: string }
+  visit: { url: string; prevUrl: string; isBackForward: boolean }
+  'before-visit': { url: string; prevUrl?: string; isBackForward: boolean }
   'before-render': {
     url: string
     prevUrl?: string
     newDocument: Document
     signal: AbortSignal
+    isBackForward: boolean
     waitUntil: (promise: Promise<unknown>) => void
   }
 }
