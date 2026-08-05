@@ -1,7 +1,9 @@
 import { Config } from './types'
 
-type InternalConfig = Required<Omit<Config, 'mount' | 'unmount'>> &
-  Pick<Config, 'mount' | 'unmount'>
+type InternalConfig = Required<
+  Omit<Config, 'mount' | 'unmount' | 'render' | 'scrollBehavior'>
+> &
+  Pick<Config, 'mount' | 'unmount' | 'render' | 'scrollBehavior'>
 
 export const config: InternalConfig = {
   watchHistory: true,
