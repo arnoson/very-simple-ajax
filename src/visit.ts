@@ -151,28 +151,16 @@ export const visit = async (
       document.querySelector(selector) && newDocument.querySelector(selector),
   )
 
-  const mergeRegions = (isScopedViewTransition = false) => {
-    const transitions: Promise<void>[] = []
-
+  const mergeRegions = () => {
     if (hasMatchingRegions) {
       for (const id of regions) {
         const region = document.querySelector<HTMLElement>(id)
         const newRegion = newDocument.querySelector<HTMLElement>(id)
         if (!region || !newRegion) continue
         const strategy = getMergeStrategy(region, newRegion)
-
-        if (isScopedViewTransition && region.startViewTransition) {
-          transitions.push(
-            region.startViewTransition(() => {
-              const result = merge(region, newRegion, strategy as MergeStrategy)
-              autoFocusEl ??= result.autoFocusEl
-            }).finished,
-          )
-        } else {
-          const result = merge(region, newRegion, strategy as MergeStrategy)
-          // Use the auto-focusable element from the first region that has one.
-          autoFocusEl ??= result.autoFocusEl
-        }
+        const result = merge(region, newRegion, strategy as MergeStrategy)
+        // Use the auto-focusable element from the first region that has one.
+        autoFocusEl ??= result.autoFocusEl
       }
     } else {
       const region = document.body
@@ -181,8 +169,6 @@ export const visit = async (
       const result = merge(region, newRegion, strategy as MergeStrategy)
       autoFocusEl = result.autoFocusEl
     }
-
-    return Promise.all(transitions)
   }
 
   // Applying the scroll change here, inside the merge/transition step, makes
@@ -202,14 +188,11 @@ export const visit = async (
 
   if (config.render) {
     await config.render(newDocument)
-  } else if (viewTransitions === 'scoped' && supportsScopedViewTransitions) {
-    await mergeRegions(true)
-    applyScrollBehavior()
-  } else if (viewTransitions === true && supportsViewTransitions) {
-    await document.startViewTransition(async () => {
-      await mergeRegions()
+  } else if (viewTransitions && document.startViewTransition) {
+    await document.startViewTransition(() => {
+      mergeRegions()
       applyScrollBehavior()
-    }).finished
+    }).ready
   } else {
     mergeRegions()
     applyScrollBehavior()
@@ -219,6 +202,3 @@ export const visit = async (
   if (autoFocus) autoFocusEl?.focus({ preventScroll: true })
   if (emitEvents) emit('visit', { url, prevUrl, isBackForward })
 }
-
-const supportsViewTransitions = 'startViewTransition' in document
-const supportsScopedViewTransitions = 'startViewTransition' in Element.prototype

@@ -28,7 +28,7 @@ export interface Config {
   watchHistory?: boolean
   merge?: MergeStrategy
   morphHeads?: boolean
-  viewTransitions?: boolean | 'scoped'
+  viewTransitions?: boolean
   render?: (newDocument: Document) => Promise<void> | void
   scrollBehavior?: ScrollBehavior
   loadingDelay?: number
