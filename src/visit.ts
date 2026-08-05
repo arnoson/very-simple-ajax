@@ -139,16 +139,28 @@ export const visit = async (
       document.querySelector(selector) && newDocument.querySelector(selector),
   )
 
-  const mergeRegions = () => {
+  const mergeRegions = (isScopedViewTransition = false) => {
+    const transitions: Promise<void>[] = []
+
     if (hasMatchingRegions) {
       for (const id of regions) {
         const region = document.querySelector<HTMLElement>(id)
         const newRegion = newDocument.querySelector<HTMLElement>(id)
         if (!region || !newRegion) continue
         const strategy = getMergeStrategy(region, newRegion)
-        const result = merge(region, newRegion, strategy as MergeStrategy)
-        // Use the auto-focusable element from the first region that has one.
-        autoFocusEl ??= result.autoFocusEl
+
+        if (isScopedViewTransition && region.startViewTransition) {
+          transitions.push(
+            region.startViewTransition(() => {
+              const result = merge(region, newRegion, strategy as MergeStrategy)
+              autoFocusEl ??= result.autoFocusEl
+            }).finished,
+          )
+        } else {
+          const result = merge(region, newRegion, strategy as MergeStrategy)
+          // Use the auto-focusable element from the first region that has one.
+          autoFocusEl ??= result.autoFocusEl
+        }
       }
     } else {
       const region = document.body
@@ -157,12 +169,16 @@ export const visit = async (
       const result = merge(region, newRegion, strategy as MergeStrategy)
       autoFocusEl = result.autoFocusEl
     }
+
+    return Promise.all(transitions)
   }
 
   if (config.render) {
     await config.render(newDocument)
-  } else if (viewTransitions && document.startViewTransition) {
-    await document.startViewTransition(mergeRegions).ready
+  } else if (viewTransitions === 'scoped' && supportsScopedViewTransitions) {
+    await mergeRegions(true)
+  } else if (viewTransitions === true && supportsViewTransitions) {
+    await document.startViewTransition(mergeRegions).finished
   } else {
     mergeRegions()
   }
@@ -170,3 +186,6 @@ export const visit = async (
   if (autoFocus) autoFocusEl?.focus()
   if (emitEvents) emit('visit', { url, prevUrl })
 }
+
+const supportsViewTransitions = 'startViewTransition' in document
+const supportsScopedViewTransitions = 'startViewTransition' in Element.prototype
