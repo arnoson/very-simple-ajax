@@ -30,12 +30,22 @@ export interface Config {
   morphHeads?: boolean
   viewTransitions?: boolean | 'scoped'
   render?: (newDocument: Document) => Promise<void> | void
+  scrollBehavior?: ScrollBehavior
   loadingDelay?: number
   progressHideDelay?: number
   prefix?: string
   mount?: (el: Element) => void
   unmount?: (el: Element) => void
 }
+
+export type ScrollPosition = { top: number }
+
+export type ScrollBehavior = (info: {
+  url: string
+  prevUrl?: string
+  isBackForward: boolean
+  savedPosition?: ScrollPosition
+}) => ScrollPosition | false | undefined
 
 export type EventMap = {
   visit: { url: string; prevUrl: string; isBackForward: boolean }

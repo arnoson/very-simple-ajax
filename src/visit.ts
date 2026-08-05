@@ -1,7 +1,7 @@
 import { config } from './config'
 import { load } from './load'
 import { merge } from './merge'
-import { EventMap, MergeStrategy, VisitOptions } from './types'
+import { EventMap, MergeStrategy, ScrollPosition, VisitOptions } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
@@ -45,6 +45,10 @@ let currentUrl = window.location.pathname
 let prevUrl: string | undefined
 let currentVisitController: AbortController | undefined
 
+// Positions are saved per url so `scrollBehavior` can restore them on
+// back/forward visits.
+const scrollPositions = new Map<string, ScrollPosition>()
+
 /**
  * Load a new page, merge the regions/bodies and add a new history entry
  * according to the action.
@@ -67,6 +71,8 @@ export const visit = async (
 ) => {
   url = normalizeUrl(url)
   const fromUrl = currentUrl
+
+  if (fromUrl) scrollPositions.set(fromUrl, { top: window.scrollY })
 
   currentVisitController?.abort()
   currentVisitController = new AbortController()
@@ -179,17 +185,38 @@ export const visit = async (
     return Promise.all(transitions)
   }
 
+  // Applying the scroll change here, inside the merge/transition step, makes
+  // it part of the view transition's before/after snapshots instead of a
+  // separate, visible jump.
+  const applyScrollBehavior = () => {
+    if (!config.scrollBehavior) return
+    const savedPosition = isBackForward ? scrollPositions.get(url) : undefined
+    const position = config.scrollBehavior({
+      url,
+      prevUrl,
+      isBackForward,
+      savedPosition,
+    })
+    if (position) window.scrollTo(position)
+  }
+
   if (config.render) {
     await config.render(newDocument)
   } else if (viewTransitions === 'scoped' && supportsScopedViewTransitions) {
     await mergeRegions(true)
+    applyScrollBehavior()
   } else if (viewTransitions === true && supportsViewTransitions) {
-    await document.startViewTransition(mergeRegions).finished
+    await document.startViewTransition(async () => {
+      await mergeRegions()
+      applyScrollBehavior()
+    }).finished
   } else {
     mergeRegions()
+    applyScrollBehavior()
   }
 
-  if (autoFocus) autoFocusEl?.focus()
+  // `preventScroll` avoids fighting with `scrollBehavior`.
+  if (autoFocus) autoFocusEl?.focus({ preventScroll: true })
   if (emitEvents) emit('visit', { url, prevUrl, isBackForward })
 }
 
