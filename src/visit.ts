@@ -47,7 +47,7 @@ let currentVisitController: AbortController | undefined
 
 // Positions are saved per url so `scrollBehavior` can restore them on
 // back/forward visits.
-const scrollPositions = new Map<string, ScrollPosition>()
+export const scrollPositions = new Map<string, ScrollPosition>()
 
 /**
  * Load a new page, merge the regions/bodies and add a new history entry
@@ -71,8 +71,6 @@ export const visit = async (
 ) => {
   url = normalizeUrl(url)
   const fromUrl = currentUrl
-
-  if (fromUrl) scrollPositions.set(fromUrl, { top: window.scrollY })
 
   currentVisitController?.abort()
   currentVisitController = new AbortController()
@@ -170,6 +168,8 @@ export const visit = async (
       autoFocusEl = result.autoFocusEl
     }
   }
+
+  if (fromUrl) scrollPositions.set(fromUrl, { top: window.scrollY })
 
   // Applying the scroll change here, inside the merge/transition step, makes
   // it part of the view transition's before/after snapshots instead of a
