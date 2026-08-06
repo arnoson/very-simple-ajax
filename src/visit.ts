@@ -61,6 +61,7 @@ export const visit = async (
     isBackForward = false,
     autoFocus = true,
     request,
+    state,
     regions = [],
     morphHeads = config.morphHeads,
     merge: mergeStrategy = config.merge,
@@ -112,9 +113,9 @@ export const visit = async (
   prevUrl = fromUrl
   currentUrl = url
 
-  const state = { regions }
-  if (action === 'replace') history.replaceState(state, '', url)
-  else if (action === 'push') history.pushState(state, '', url)
+  const data = { ...state, regions }
+  if (action === 'replace') history.replaceState(data, '', url)
+  else if (action === 'push') history.pushState(data, '', url)
 
   // To keep things simple, most events aren't async, but before rendering we
   // might want to finish some animation like collapsing a menu, etc.

@@ -5,6 +5,7 @@ export interface VisitOptions extends Omit<Config, 'watchHistory'> {
   autoFocus?: boolean
   request?: RequestInit
   regions?: string[]
+  state?: Record<string, unknown>
 }
 
 export type StartOptions = Config

@@ -15,6 +15,7 @@ export const start = (options: StartOptions = {}) => {
         action: 'none',
         isBackForward: true,
         regions: event.state?.regions ?? [],
+        state: event.state,
       })
     })
   }
