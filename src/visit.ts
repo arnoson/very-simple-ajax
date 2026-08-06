@@ -105,8 +105,8 @@ export const visit = async (
   // in `load()` trigger a reload.
   if (!newDocument) return
 
-  // Update currentUrl to the final URL (after potential redirect and
-  // hash handling).
+  // Commit prevUrl/currentUrl only once the visit is confirmed to proceed.
+  // CurrentUrl reflects the final URL after potential redirect/hash handling.
   prevUrl = fromUrl
   currentUrl = url
 
