@@ -9,7 +9,7 @@ export const start = (options: StartOptions = {}) => {
   // browser's own restoration to avoid it fighting with our own.
   if (config.scrollBehavior) history.scrollRestoration = 'manual'
 
-  if (config.watchHistory) {
+  if (config.interceptHistory) {
     // Disable bfcache so regions-based partial updates work correctly.
     // With regions, we only update changed sections and keep the rest of the
     // page intact. bfcache would restore the entire page, causing
