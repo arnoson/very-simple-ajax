@@ -16,15 +16,7 @@ const normalizeUrl = (url: string): string => {
   }
 }
 
-const emit = async <E extends keyof EventMap>(
-  type: E,
-  payload: EventMap[E],
-) => {
-  const event = new CustomEvent(`ajax:${type}`, { detail: payload })
-  document.dispatchEvent(event)
-}
-
-const emitAsync = async <E extends keyof EventMap>(
+const emit = <E extends keyof EventMap>(
   type: E,
   payload: Omit<EventMap[E], 'waitUntil'>,
 ) => {
@@ -37,8 +29,7 @@ const emitAsync = async <E extends keyof EventMap>(
   const event = new CustomEvent(`ajax:${type}`, { detail: payload })
   document.dispatchEvent(event)
 
-  if (!waiting.length) return
-  await Promise.allSettled(waiting)
+  if (waiting.length) return Promise.allSettled(waiting)
 }
 
 let currentUrl = window.location.pathname
@@ -57,7 +48,6 @@ export const visit = async (
   url: string,
   {
     action = 'none',
-    emitEvents = true,
     isBackForward = false,
     autoFocus = true,
     request,
@@ -81,7 +71,14 @@ export const visit = async (
   // create a new history entry.
   if (url === currentUrl) action = 'none'
 
-  if (emitEvents) emit('before-visit', { url, prevUrl: fromUrl, isBackForward })
+  await emit('before-visit', {
+    url,
+    prevUrl: fromUrl,
+    signal,
+    isBackForward,
+    state,
+  })
+  if (signal.aborted) return
 
   let newDocument: Document | undefined
 
@@ -119,22 +116,16 @@ export const visit = async (
 
   // To keep things simple, most events aren't async, but before rendering we
   // might want to finish some animation like collapsing a menu, etc.
-  if (emitEvents) {
-    await emitAsync('before-render', {
-      url,
-      prevUrl,
-      newDocument,
-      signal,
-      isBackForward,
-    })
-    if (signal.aborted) return
-  }
+
+  const payload = { url, prevUrl, isBackForward, newDocument, signal, state }
+  await emit('before-render', payload)
+  if (signal.aborted) return
 
   // Cache the previous document for future back/forward navigation. We do this
   // after the before-render event is dispatched so we can prepare the previous
   // document for caching (e.g. changing the DOM) while already having access
   // to the new document.
-  if (!isBackForward) cache.set(prevUrl!, document.cloneNode(true) as Document)
+  cache.set(prevUrl!, document.cloneNode(true) as Document)
 
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
@@ -190,16 +181,20 @@ export const visit = async (
   if (config.render) {
     await config.render(newDocument)
   } else if (viewTransitions && document.startViewTransition) {
-    await document.startViewTransition(() => {
+    await document.startViewTransition(async () => {
       mergeRegions()
+      await emit('render', payload)
       applyScrollBehavior()
     }).ready
   } else {
     mergeRegions()
+    await emit('render', payload)
     applyScrollBehavior()
   }
 
+  if (!signal.aborted) return
+
   // `preventScroll` avoids fighting with `scrollBehavior`.
   if (autoFocus) autoFocusEl?.focus({ preventScroll: true })
-  if (emitEvents) emit('visit', { url, prevUrl, isBackForward })
+  emit('visit', payload)
 }

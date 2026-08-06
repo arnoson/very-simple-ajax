@@ -1,6 +1,5 @@
 export interface VisitOptions extends Omit<Config, 'watchHistory'> {
   action?: 'push' | 'replace' | 'none'
-  emitEvents?: boolean
   isBackForward?: boolean
   autoFocus?: boolean
   request?: RequestInit
@@ -48,22 +47,24 @@ export type ScrollBehavior = (info: {
   savedPosition?: ScrollPosition
 }) => ScrollPosition | false | undefined
 
-export type EventMap = {
-  visit: { url: string; prevUrl: string; isBackForward: boolean }
-  'before-visit': { url: string; prevUrl?: string; isBackForward: boolean }
-  'before-render': {
-    url: string
-    prevUrl?: string
-    newDocument: Document
-    signal: AbortSignal
-    isBackForward: boolean
-    waitUntil: (promise: Promise<unknown>) => void
-  }
+type WaitUntil = (promise: Promise<unknown>) => void
+
+type Payload = {
+  url: string
+  prevUrl?: string
+  isBackForward: boolean
+  newDocument: Document
+  signal: AbortSignal
+  state?: Record<string, unknown>
+  waitUntil: WaitUntil
 }
 
-export type SimpleVisitEvent = CustomEvent<EventMap['visit']>
-export type SimpleBeforeVisitEvent = CustomEvent<EventMap['before-visit']>
-export type SimpleBeforeRenderEvent = CustomEvent<EventMap['before-render']>
+export type EventMap = {
+  visit: { url: string; prevUrl: string; isBackForward: boolean }
+  'before-visit': Omit<Payload, 'newDocument'>
+  'before-render': Payload
+  render: Payload
+}
 
 type DomEventMap = {
   [K in keyof EventMap as `ajax:${K & string}`]: CustomEvent<EventMap[K]>
