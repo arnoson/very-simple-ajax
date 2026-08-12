@@ -1,7 +1,11 @@
 // Augment this interface to type the `state` passed to `visit()` and
 // received in event payloads, e.g. `declare module ... { interface AjaxState
 // { template?: string } }`.
-export interface AjaxState extends Record<string, unknown> {}
+export interface AjaxState extends Record<string, unknown> {
+  // The regions used for the visit, so they can be reused on back/forward
+  // visits. Set internally, not part of the public `state` option.
+  regions?: string[]
+}
 
 export interface VisitOptions extends Omit<Config, 'interceptHistory'> {
   action?: 'push' | 'replace' | 'none'
@@ -9,7 +13,7 @@ export interface VisitOptions extends Omit<Config, 'interceptHistory'> {
   autoFocus?: boolean
   request?: RequestInit
   regions?: string[]
-  state?: AjaxState
+  state?: Omit<AjaxState, 'regions'>
 }
 
 export type StartOptions = Config

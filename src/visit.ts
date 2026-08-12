@@ -71,6 +71,8 @@ export const visit = async (
   const fromUrl = currentUrl
   const fromState = currentState
 
+  state = { ...state, regions }
+
   currentVisitController?.abort()
   currentVisitController = new AbortController()
   const { signal } = currentVisitController
@@ -118,9 +120,8 @@ export const visit = async (
   currentUrl = url
   currentState = state
 
-  const data = { ...state, regions }
-  if (action === 'replace') history.replaceState(data, '', url)
-  else if (action === 'push') history.pushState(data, '', url)
+  if (action === 'replace') history.replaceState(state, '', url)
+  else if (action === 'push') history.pushState(state, '', url)
 
   let from = { url: fromUrl, state: fromState, document }
   const to = { url, state, document: newDocument }
