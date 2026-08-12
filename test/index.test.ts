@@ -37,7 +37,9 @@ test('before-render can delay dom swap', async ({ page }) => {
 
   await page.locator("a[href='/example/about.html']").click()
 
-  await expect(page).toHaveURL('/example/index.html')
+  // The URL updates immediately (like native browser navigation), even
+  // though the dom swap is still delayed by `waitUntil`.
+  await expect(page).toHaveURL('/example/about.html')
   await expect(page.locator('#heading')).toHaveText('Home')
 
   await page.evaluate(
