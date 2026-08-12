@@ -125,8 +125,6 @@ export const visit = async (
   let from = { url: fromUrl, state: fromState, document }
   const to = { url, state, document: newDocument }
 
-  // To keep things simple, most events aren't async, but before rendering we
-  // might want to finish some animation like collapsing a menu, etc.
   await emit('before-render', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
