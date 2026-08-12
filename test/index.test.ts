@@ -79,3 +79,64 @@ test('manual navigation works', async ({ page }) => {
   )
   await expect(page).toHaveURL('/example/about.html')
 })
+
+test('events receive from/to page state', async ({ page }) => {
+  await page.goto('/example/index.html')
+
+  const events: Record<string, unknown> = {}
+  await page.exposeFunction('record', (type: string, detail: unknown) => {
+    events[type] = detail
+  })
+
+  await page.evaluate(() => {
+    const record = (type: string) => (event: Event) => {
+      const detail = (event as CustomEvent).detail
+      // @ts-ignore
+      window.record(type, {
+        fromUrl: detail.from.url,
+        toUrl: detail.to.url,
+        fromIsDocument: detail.from.document instanceof Document,
+        toIsDocument: detail.to.document instanceof Document,
+        isBackForward: detail.isBackForward,
+      })
+    }
+    document.addEventListener('ajax:before-visit', record('before-visit'))
+    document.addEventListener('ajax:before-render', record('before-render'))
+    document.addEventListener('ajax:render', record('render'))
+    document.addEventListener('ajax:visit', record('visit'))
+  })
+
+  await page.locator("a[href='/example/about.html']").click()
+  await expect(page).toHaveURL('/example/about.html')
+  await expect.poll(() => Object.keys(events).length).toBe(4)
+
+  expect(events['before-visit']).toEqual({
+    fromUrl: '/example/index.html',
+    toUrl: '/example/about.html',
+    fromIsDocument: true,
+    // `to.document` isn't loaded yet when `before-visit` fires.
+    toIsDocument: false,
+    isBackForward: false,
+  })
+  expect(events['before-render']).toEqual({
+    fromUrl: '/example/index.html',
+    toUrl: '/example/about.html',
+    fromIsDocument: true,
+    toIsDocument: true,
+    isBackForward: false,
+  })
+  expect(events['render']).toEqual({
+    fromUrl: '/example/index.html',
+    toUrl: '/example/about.html',
+    fromIsDocument: true,
+    toIsDocument: true,
+    isBackForward: false,
+  })
+  expect(events['visit']).toEqual({
+    fromUrl: '/example/index.html',
+    toUrl: '/example/about.html',
+    fromIsDocument: true,
+    toIsDocument: true,
+    isBackForward: false,
+  })
+})

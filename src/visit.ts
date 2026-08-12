@@ -1,7 +1,13 @@
 import { config } from './config'
 import { load } from './load'
 import { merge } from './merge'
-import { EventMap, MergeStrategy, ScrollPosition, VisitOptions } from './types'
+import {
+  AjaxState,
+  EventMap,
+  MergeStrategy,
+  ScrollPosition,
+  VisitOptions,
+} from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
@@ -33,6 +39,7 @@ const emit = <E extends keyof EventMap>(
 }
 
 let currentUrl = window.location.pathname
+let currentState = history.state as AjaxState | undefined
 let prevUrl: string | undefined
 let currentVisitController: AbortController | undefined
 
@@ -62,6 +69,7 @@ export const visit = async (
 ) => {
   url = normalizeUrl(url)
   const fromUrl = currentUrl
+  const fromState = currentState
 
   currentVisitController?.abort()
   currentVisitController = new AbortController()
@@ -72,11 +80,10 @@ export const visit = async (
   if (url === currentUrl) action = 'none'
 
   await emit('before-visit', {
-    url,
-    prevUrl: fromUrl,
+    from: { url: fromUrl, state: fromState, document },
+    to: { url, state },
     signal,
     isBackForward,
-    state,
   })
   if (signal.aborted) return
 
@@ -109,23 +116,27 @@ export const visit = async (
   // CurrentUrl reflects the final URL after potential redirect/hash handling.
   prevUrl = fromUrl
   currentUrl = url
+  currentState = state
 
   const data = { ...state, regions }
   if (action === 'replace') history.replaceState(data, '', url)
   else if (action === 'push') history.pushState(data, '', url)
 
+  let from = { url: fromUrl, state: fromState, document }
+  const to = { url, state, document: newDocument }
+
   // To keep things simple, most events aren't async, but before rendering we
   // might want to finish some animation like collapsing a menu, etc.
-
-  const payload = { url, prevUrl, isBackForward, newDocument, signal, state }
-  await emit('before-render', payload)
+  await emit('before-render', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
   // Cache the previous document for future back/forward navigation. We do this
   // after the before-render event is dispatched so we can prepare the previous
   // document for caching (e.g. changing the DOM) while already having access
-  // to the new document.
-  cache.set(prevUrl!, document.cloneNode(true) as Document)
+  // to the new document. Also replaces `from.document` since `document`
+  // itself is about to be mutated by the merge.
+  from = { ...from, document: document.cloneNode(true) as Document }
+  cache.set(prevUrl!, from.document)
 
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
@@ -170,8 +181,8 @@ export const visit = async (
     if (!config.scrollBehavior) return
     const savedPosition = isBackForward ? scrollPositions.get(url) : undefined
     const position = config.scrollBehavior({
-      url,
-      prevUrl,
+      from,
+      to,
       isBackForward,
       savedPosition,
     })
@@ -183,18 +194,18 @@ export const visit = async (
   } else if (viewTransitions && document.startViewTransition) {
     await document.startViewTransition(async () => {
       mergeRegions()
-      await emit('render', payload)
+      await emit('render', { from, to, isBackForward, signal })
       applyScrollBehavior()
     }).ready
   } else {
     mergeRegions()
-    await emit('render', payload)
+    await emit('render', { from, to, isBackForward, signal })
     applyScrollBehavior()
   }
 
-  if (!signal.aborted) return
+  if (signal.aborted) return
 
   // `preventScroll` avoids fighting with `scrollBehavior`.
   if (autoFocus) autoFocusEl?.focus({ preventScroll: true })
-  emit('visit', payload)
+  emit('visit', { from, to, isBackForward })
 }

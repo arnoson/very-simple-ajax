@@ -1,10 +1,15 @@
+// Augment this interface to type the `state` passed to `visit()` and
+// received in event payloads, e.g. `declare module ... { interface AjaxState
+// { template?: string } }`.
+export interface AjaxState extends Record<string, unknown> {}
+
 export interface VisitOptions extends Omit<Config, 'interceptHistory'> {
   action?: 'push' | 'replace' | 'none'
   isBackForward?: boolean
   autoFocus?: boolean
   request?: RequestInit
   regions?: string[]
-  state?: Record<string, unknown>
+  state?: AjaxState
 }
 
 export type StartOptions = Config
@@ -41,27 +46,31 @@ export interface Config {
 export type ScrollPosition = { top: number }
 
 export type ScrollBehavior = (info: {
-  url: string
-  prevUrl?: string
+  from: PageState
+  to: PageState
   isBackForward: boolean
   savedPosition?: ScrollPosition
 }) => ScrollPosition | false | undefined
 
 type WaitUntil = (promise: Promise<unknown>) => void
 
-type Payload = {
+export type PageState = {
   url: string
-  prevUrl?: string
+  state?: AjaxState
+  document: Document
+}
+
+type Payload = {
+  from: PageState
+  to: PageState
   isBackForward: boolean
-  newDocument: Document
   signal: AbortSignal
-  state?: Record<string, unknown>
   waitUntil: WaitUntil
 }
 
 export type EventMap = {
-  visit: { url: string; prevUrl: string; isBackForward: boolean }
-  'before-visit': Omit<Payload, 'newDocument'>
+  visit: { from: PageState; to: PageState; isBackForward: boolean }
+  'before-visit': Omit<Payload, 'to'> & { to: Omit<PageState, 'document'> }
   'before-render': Payload
   render: Payload
 }
