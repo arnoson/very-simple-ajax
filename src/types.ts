@@ -61,7 +61,7 @@ type WaitUntil = (promise: Promise<unknown>) => void
 export type PageState = {
   url: string
   state?: AjaxState
-  document: Document
+  document?: Document
 }
 
 type Payload = {
@@ -74,7 +74,7 @@ type Payload = {
 
 export type EventMap = {
   visit: { from: PageState; to: PageState; isBackForward: boolean }
-  'before-visit': Omit<Payload, 'to'> & { to: Omit<PageState, 'document'> }
+  'before-visit': Payload
   'before-render': Payload
   render: Payload
 }

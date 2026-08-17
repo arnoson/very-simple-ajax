@@ -10,12 +10,6 @@ export const start = (options: StartOptions = {}) => {
   if (config.scrollBehavior) history.scrollRestoration = 'manual'
 
   if (config.interceptHistory) {
-    // Disable bfcache so regions-based partial updates work correctly.
-    // With regions, we only update changed sections and keep the rest of the
-    // page intact. bfcache would restore the entire page, causing
-    //  inconsistencies.
-    window.addEventListener('unload', () => {})
-
     window.addEventListener('popstate', (event) => {
       visit(window.location.href, {
         action: 'none',
