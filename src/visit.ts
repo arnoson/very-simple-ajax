@@ -1,5 +1,5 @@
 import { config } from './config'
-import { load } from './load'
+import { load, cache, parseHtml } from './load'
 import { merge } from './merge'
 import {
   AjaxState,
@@ -10,8 +10,6 @@ import {
 } from './types'
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
-
-export const cache = new Map<string, Document>()
 
 const normalizeUrl = (url: string): string => {
   try {
@@ -40,7 +38,6 @@ const emit = <E extends keyof EventMap>(
 
 let currentUrl = window.location.pathname
 let currentState = history.state as AjaxState | undefined
-let prevUrl: string | undefined
 let currentVisitController: AbortController | undefined
 
 // Positions are saved per url so `scrollBehavior` can restore them on
@@ -94,7 +91,8 @@ export const visit = async (
   // If this is a back/forward navigation we simulate the browser behavior and
   // try to receive the document from cache.
   if (isBackForward) {
-    newDocument = cache.get(url)?.cloneNode(true) as Document | undefined
+    const html = cache.get(url)
+    if (html) newDocument = parseHtml(html)
   }
 
   // Load the new document if we don't use it from cache. There might also be
@@ -114,9 +112,9 @@ export const visit = async (
   // in `load()` trigger a reload.
   if (!newDocument) return
 
-  // Commit prevUrl/currentUrl only once the visit is confirmed to proceed.
-  // CurrentUrl reflects the final URL after potential redirect/hash handling.
-  prevUrl = fromUrl
+  // Commit currentUrl/currentState only once the visit is confirmed to
+  // proceed. currentUrl reflects the final URL after potential
+  // redirect/hash handling.
   currentUrl = url
   currentState = state
 
@@ -129,13 +127,9 @@ export const visit = async (
   await emit('before-render', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
-  // Cache the previous document for future back/forward navigation. We do this
-  // after the before-render event is dispatched so we can prepare the previous
-  // document for caching (e.g. changing the DOM) while already having access
-  // to the new document. Also replaces `from.document` since `document`
-  // itself is about to be mutated by the merge.
+  // Snapshot the previous document for the `render` event only. `document`
+  // itself is about to be mutated by the merge below.
   from = { ...from, document: document.cloneNode(true) as Document }
-  cache.set(prevUrl!, from.document)
 
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 

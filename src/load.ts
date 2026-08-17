@@ -5,6 +5,8 @@ let currentLoadController: AbortController | undefined
 let progress = 0
 let trickleInterval: number | undefined
 
+export const cache = new Map<string, string>()
+
 export const load = async (
   url: string,
   regions: string[],
@@ -38,7 +40,8 @@ export const load = async (
     })
 
     const html = await response.text()
-    const document = parser.parseFromString(html, 'text/html')
+    if (response.ok) cache.set(url, html)
+    const document = parseHtml(html)
     return { document, response }
   } catch (e) {
     setProgress(0)
@@ -56,6 +59,9 @@ export const load = async (
     setTimeout(() => toggleProgress(false), options.progressHideDelay)
   }
 }
+
+export const parseHtml = (html: string): Document =>
+  parser.parseFromString(html, 'text/html')
 
 const trickle = () => {
   const amount = -0.095 * progress + 0.1
