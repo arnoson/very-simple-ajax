@@ -19,6 +19,12 @@ const myPlugin = (): Plugin => ({
           return
         }
 
+        // Vite's static/html middlewares only handle GET, but we still want
+        // to serve the page for POST form submissions in tests.
+        if (req.method === 'POST' && req.url?.startsWith('/example/form/')) {
+          req.method = 'GET'
+        }
+
         next()
       })
     }

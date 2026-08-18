@@ -1,6 +1,6 @@
 import { config } from './config'
 import { StartOptions } from './types'
-import { visit } from './visit'
+import { interceptLinks, interceptForms, interceptHistory } from './intercept'
 
 export const start = (options: StartOptions = {}) => {
   Object.assign(config, options)
@@ -9,16 +9,9 @@ export const start = (options: StartOptions = {}) => {
   // browser's own restoration to avoid it fighting with our own.
   if (config.scrollBehavior) history.scrollRestoration = 'manual'
 
-  if (config.interceptHistory) {
-    window.addEventListener('popstate', (event) => {
-      visit(window.location.href, {
-        action: 'none',
-        isBackForward: true,
-        regions: event.state?.regions ?? [],
-        state: event.state,
-      })
-    })
-  }
+  interceptLinks()
+  interceptForms()
+  interceptHistory()
 
   if (import.meta.env.DEV) {
     document.addEventListener('ajax:before-visit', () => {

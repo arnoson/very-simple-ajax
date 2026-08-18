@@ -7,7 +7,7 @@ export interface AjaxState extends Record<string, unknown> {
   regions?: string[]
 }
 
-export interface VisitOptions extends Omit<Config, 'interceptHistory'> {
+export interface VisitOptions extends Config {
   action?: 'push' | 'replace' | 'none'
   isBackForward?: boolean
   autoFocus?: boolean
@@ -34,7 +34,6 @@ export type MergeStrategy =
   | 'update'
 
 export interface Config {
-  interceptHistory?: boolean
   merge?: MergeStrategy
   morphHeads?: boolean
   viewTransitions?: boolean

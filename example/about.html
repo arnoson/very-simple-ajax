@@ -17,10 +17,19 @@
         <li>
           <a #component="link" href="/example/index.html">Home</a>
         </li>
+        <li>
+          <a
+            id="replace-link"
+            #ajax-action="replace"
+            href="/example/index.html"
+          >
+            Replace Link
+          </a>
+        </li>
       </ul>
     </nav>
 
-    <h1>About</h1>
+    <h1 id="heading">About</h1>
     <script>
       ;(() => {
         const root = document.documentElement

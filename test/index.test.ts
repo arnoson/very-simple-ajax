@@ -4,7 +4,7 @@ test('page visit works', async ({ page }) => {
   await page.goto('/example/index.html')
   await expect(page).toHaveTitle(/Very Simple Ajax/)
 
-  await page.locator("a[href='/example/about.html']").click()
+  await page.locator("a[href='/example/about.html'][\\#component]").click()
   await expect(page).toHaveURL('/example/about.html')
   await expect(page).toHaveTitle(/About/)
   expect(await page.locator('h1').innerText()).toBe('About')
@@ -35,7 +35,7 @@ test('before-render can delay dom swap', async ({ page }) => {
     })
   })
 
-  await page.locator("a[href='/example/about.html']").click()
+  await page.locator("a[href='/example/about.html'][\\#component]").click()
 
   // The URL updates immediately (like native browser navigation), even
   // though the dom swap is still delayed by `waitUntil`.
@@ -108,7 +108,7 @@ test('events receive from/to page state', async ({ page }) => {
     document.addEventListener('ajax:visit', record('visit'))
   })
 
-  await page.locator("a[href='/example/about.html']").click()
+  await page.locator("a[href='/example/about.html'][\\#component]").click()
   await expect(page).toHaveURL('/example/about.html')
   await expect.poll(() => Object.keys(events).length).toBe(4)
 
@@ -141,4 +141,169 @@ test('events receive from/to page state', async ({ page }) => {
     toIsDocument: true,
     isBackForward: false,
   })
+})
+
+test('plain links are intercepted by default', async ({ page }) => {
+  await page.goto('/example/index.html')
+
+  const [request] = await Promise.all([
+    page.waitForRequest('/example/about.html'),
+    page.locator('#plain-link').click(),
+  ])
+
+  expect(request.headers()['x-very-simple-ajax']).toBe('true')
+  await expect(page).toHaveURL('/example/about.html')
+})
+
+test('links with the reload attribute are not intercepted', async ({
+  page,
+}) => {
+  await page.goto('/example/index.html')
+
+  const [request] = await Promise.all([
+    page.waitForRequest('/example/about.html'),
+    page.locator('#reload-link').click(),
+  ])
+
+  expect(request.headers()['x-very-simple-ajax']).toBeUndefined()
+  await expect(page).toHaveURL('/example/about.html')
+})
+
+test('links with target="_blank" are not intercepted', async ({ page }) => {
+  await page.goto('/example/index.html')
+
+  const [popup] = await Promise.all([
+    page.waitForEvent('popup'),
+    page.locator('#blank-link').click(),
+  ])
+
+  await expect(popup).toHaveURL('/example/about.html')
+})
+
+test('get forms are intercepted by default', async ({ page }) => {
+  await page.goto('/example/form/index.html')
+
+  const [request] = await Promise.all([
+    page.waitForRequest(/\/example\/form\/other\.html/),
+    page.locator('#get-form button').click(),
+  ])
+
+  expect(request.headers()['x-very-simple-ajax']).toBe('true')
+  expect(request.method()).toBe('GET')
+  await expect(page).toHaveURL('/example/form/other.html?q=hello')
+  await expect(page.locator('h1')).toHaveText('Form Result')
+})
+
+test('post forms are intercepted by default', async ({ page }) => {
+  await page.goto('/example/form/index.html')
+
+  const [request] = await Promise.all([
+    page.waitForRequest('/example/form/other.html'),
+    page.locator('#post-form button').click(),
+  ])
+
+  expect(request.headers()['x-very-simple-ajax']).toBe('true')
+  expect(request.method()).toBe('POST')
+  await expect(page).toHaveURL('/example/form/other.html')
+  await expect(page.locator('h1')).toHaveText('Form Result')
+})
+
+test('forms with the reload attribute are not intercepted', async ({
+  page,
+}) => {
+  await page.goto('/example/form/index.html')
+
+  const [request] = await Promise.all([
+    page.waitForRequest(/\/example\/form\/other\.html/),
+    page.locator('#reload-form button').click(),
+  ])
+
+  expect(request.headers()['x-very-simple-ajax']).toBeUndefined()
+  await expect(page).toHaveURL(/\/example\/form\/other\.html\??$/)
+})
+
+test('forms with fields named "action"/"method" are still intercepted correctly', async ({
+  page,
+}) => {
+  await page.goto('/example/form/index.html')
+
+  const [request] = await Promise.all([
+    page.waitForRequest(/\/example\/form\/other\.html/),
+    page.locator('#named-field-form button').click(),
+  ])
+
+  expect(request.headers()['x-very-simple-ajax']).toBe('true')
+  expect(request.method()).toBe('GET')
+  await expect(page).toHaveURL(
+    '/example/form/other.html?action=not-a-url&method=not-a-method',
+  )
+  await expect(page.locator('h1')).toHaveText('Form Result')
+})
+
+test('links with the ajax-merge attribute override the default merge strategy', async ({
+  page,
+}) => {
+  await page.goto('/example/index.html')
+
+  // I haven't found a way to assert if two DOM nodes are the same. As a
+  // workaround a random hash is created at runtime to identify the DOM node.
+  const hash = crypto.getRandomValues(new Uint8Array(20)).join('')
+  await page.evaluate((hash) => {
+    // @ts-ignore
+    document.body.$hash = hash
+  }, hash)
+
+  await page.locator('#merge-link').click()
+  await expect(page).toHaveURL('/example/about.html')
+
+  // `update` keeps the region element itself and only swaps its children,
+  // unlike the default `replace` strategy which swaps the element itself.
+  const newHash = await page.evaluate(
+    // @ts-ignore
+    () => document.body.$hash,
+  )
+  expect(newHash).toBe(hash)
+})
+
+test('links with the ajax-regions attribute only update the given region', async ({
+  page,
+}) => {
+  await page.goto('/example/index.html')
+
+  await page.locator('#region-link').click()
+  await expect(page).toHaveURL('/example/about.html')
+  await expect(page.locator('#heading')).toHaveText('About')
+
+  // The rest of the page wasn't touched, since only `#heading` was a target
+  // region.
+  await expect(page.locator('#plain-link')).toBeVisible()
+})
+
+test('links with the ajax-state attribute set custom history state', async ({
+  page,
+}) => {
+  await page.goto('/example/index.html')
+
+  await page.locator('#state-link').click()
+  await expect(page).toHaveURL('/example/about.html')
+
+  const state = await page.evaluate(() => history.state)
+  expect(state.template).toBe('custom')
+})
+
+test('links with the ajax-action attribute override the default push action', async ({
+  page,
+}) => {
+  await page.goto('/example/index.html')
+
+  await page.locator("a[href='/example/about.html'][\\#component]").click()
+  await expect(page).toHaveURL('/example/about.html')
+
+  await page.locator('#replace-link').click()
+  await expect(page).toHaveURL('/example/index.html')
+
+  // The replace-link visit replaced the "about" entry instead of pushing a
+  // new one, so going back skips straight past it to the original page.
+  await page.goBack()
+  await expect(page).toHaveURL('/example/index.html')
 })

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form</title>
+    <script src="/example/index.ts" type="module" defer></script>
+  </head>
+  <body>
+    <div id="progress"></div>
+
+    <h1>Form</h1>
+
+    <form id="get-form" action="/example/form/other.html" method="get">
+      <input type="text" name="q" value="hello" />
+      <button type="submit">Submit GET</button>
+    </form>
+
+    <form id="post-form" action="/example/form/other.html" method="post">
+      <input type="text" name="q" value="hello" />
+      <button type="submit">Submit POST</button>
+    </form>
+
+    <form id="reload-form" #ajax-reload action="/example/form/other.html">
+      <button type="submit">Submit Reload</button>
+    </form>
+
+    <form id="named-field-form" action="/example/form/other.html">
+      <input type="hidden" name="action" value="not-a-url" />
+      <input type="hidden" name="method" value="not-a-method" />
+      <button type="submit">Submit Named Fields</button>
+    </form>
+  </body>
+</html>

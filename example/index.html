@@ -23,6 +23,42 @@
         <li>
           <a #component="link" href="/example/redirect.html"> Redirect </a>
         </li>
+        <li>
+          <a id="plain-link" href="/example/about.html">Plain Link</a>
+        </li>
+        <li>
+          <a id="reload-link" #ajax-reload href="/example/about.html">
+            Reload Link
+          </a>
+        </li>
+        <li>
+          <a id="blank-link" href="/example/about.html" target="_blank">
+            Blank Link
+          </a>
+        </li>
+        <li>
+          <a
+            id="region-link"
+            #ajax-regions="#heading"
+            href="/example/about.html"
+          >
+            Region Link
+          </a>
+        </li>
+        <li>
+          <a
+            id="state-link"
+            #ajax-state='{"template":"custom"}'
+            href="/example/about.html"
+          >
+            State Link
+          </a>
+        </li>
+        <li>
+          <a id="merge-link" #ajax-merge="update" href="/example/about.html">
+            Merge Link
+          </a>
+        </li>
       </ul>
     </nav>
 

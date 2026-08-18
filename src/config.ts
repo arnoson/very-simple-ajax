@@ -6,7 +6,6 @@ type InternalConfig = Required<
   Pick<Config, 'mount' | 'unmount' | 'render' | 'scrollBehavior'>
 
 export const config: InternalConfig = {
-  interceptHistory: true,
   morphHeads: true,
   merge: 'replace',
   viewTransitions: false,

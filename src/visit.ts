@@ -37,7 +37,11 @@ const emit = <E extends keyof EventMap>(
 }
 
 let currentUrl = window.location.pathname
-let currentState = history.state as AjaxState | undefined
+
+// Exported so `interceptHistory` can read the state of the page we're
+// currently on (i.e. the one we're navigating away from on a back/forward
+// visit), since that's what holds the regions used to reach it.
+export let currentState = history.state as AjaxState | undefined
 let currentVisitController: AbortController | undefined
 
 // Positions are saved per url so `scrollBehavior` can restore them on
