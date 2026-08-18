@@ -8,6 +8,7 @@ type InternalConfig = Required<
 export const config: InternalConfig = {
   morphHeads: true,
   merge: 'replace',
+  executeScripts: true,
   viewTransitions: false,
   loadingDelay: 500,
   progressHideDelay: 500,

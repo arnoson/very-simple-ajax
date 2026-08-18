@@ -36,6 +36,7 @@ export type MergeStrategy =
 export interface Config {
   merge?: MergeStrategy
   morphHeads?: boolean
+  executeScripts?: boolean
   viewTransitions?: boolean
   render?: (newDocument: Document) => Promise<void> | void
   scrollBehavior?: ScrollBehavior

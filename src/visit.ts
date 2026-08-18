@@ -1,6 +1,7 @@
 import { config } from './config'
 import { load, cache, parseHtml } from './load'
 import { merge } from './merge'
+import { executeScripts } from './scripts'
 import {
   AjaxState,
   EventMap,
@@ -63,6 +64,7 @@ export const visit = async (
     regions = [],
     morphHeads = config.morphHeads,
     merge: mergeStrategy = config.merge,
+    executeScripts: shouldExecuteScripts = config.executeScripts,
     viewTransitions = config.viewTransitions,
     loadingDelay = config.loadingDelay,
     progressHideDelay = config.progressHideDelay,
@@ -149,7 +151,9 @@ export const visit = async (
       document.querySelector(selector) && newDocument.querySelector(selector),
   )
 
-  const mergeRegions = () => {
+  const mergeRegions = async () => {
+    const scriptPromises: Promise<unknown>[] = []
+
     if (hasMatchingRegions) {
       for (const id of regions) {
         const region = document.querySelector<HTMLElement>(id)
@@ -159,6 +163,12 @@ export const visit = async (
         const result = merge(region, newRegion, strategy as MergeStrategy)
         // Use the auto-focusable element from the first region that has one.
         autoFocusEl ??= result.autoFocusEl
+
+        if (shouldExecuteScripts) {
+          // Re-query since strategies like 'replace' swap out the element.
+          const finalRegion = document.querySelector<HTMLElement>(id)
+          if (finalRegion) scriptPromises.push(executeScripts(finalRegion))
+        }
       }
     } else {
       const region = document.body
@@ -166,7 +176,13 @@ export const visit = async (
       const strategy = getMergeStrategy(region, newRegion)
       const result = merge(region, newRegion, strategy as MergeStrategy)
       autoFocusEl = result.autoFocusEl
+
+      if (shouldExecuteScripts) {
+        scriptPromises.push(executeScripts(document.body))
+      }
     }
+
+    if (scriptPromises.length) await Promise.all(scriptPromises)
   }
 
   if (fromUrl) scrollPositions.set(fromUrl, { top: window.scrollY })
@@ -190,12 +206,12 @@ export const visit = async (
     await config.render(newDocument)
   } else if (viewTransitions && document.startViewTransition) {
     await document.startViewTransition(async () => {
-      mergeRegions()
+      await mergeRegions()
       await emit('render', { from, to, isBackForward, signal })
       applyScrollBehavior()
     }).ready
   } else {
-    mergeRegions()
+    await mergeRegions()
     await emit('render', { from, to, isBackForward, signal })
     applyScrollBehavior()
   }
