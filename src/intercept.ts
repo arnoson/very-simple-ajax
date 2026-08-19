@@ -1,5 +1,5 @@
 import { config } from './config'
-import { currentState, visit } from './visit'
+import { currentState, currentUrl, normalizeUrl, visit } from './visit'
 import { MergeStrategy, VisitOptions } from './types'
 
 export const interceptLinks = () => {
@@ -82,6 +82,12 @@ export const interceptForms = () => {
 
 export const interceptHistory = () => {
   window.addEventListener('popstate', (event) => {
+    // A same-page fragment navigation (e.g. clicking a `#anchor` link) also
+    // fires `popstate`, but there's nothing to fetch/merge since the
+    // pathname/search haven't changed, so let the browser's native scroll
+    // stand instead of re-visiting the page.
+    if (normalizeUrl(window.location.href) === normalizeUrl(currentUrl)) return
+
     // Use the regions from the state of the page we're navigating away from
     // (not `event.state`, which belongs to the page we're going back/forward
     // to) since those are the regions that were used to reach the current

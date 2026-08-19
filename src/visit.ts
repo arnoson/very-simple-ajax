@@ -12,7 +12,7 @@ import {
 // @ts-ignore (missing types)
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 
-const normalizeUrl = (url: string): string => {
+export const normalizeUrl = (url: string): string => {
   try {
     const urlObj = new URL(url, window.location.origin)
     return urlObj.pathname + urlObj.search
@@ -37,7 +37,7 @@ const emit = <E extends keyof EventMap>(
   if (waiting.length) return Promise.allSettled(waiting)
 }
 
-let currentUrl = window.location.pathname
+export let currentUrl = window.location.pathname
 
 // Exported so `interceptHistory` can read the state of the page we're
 // currently on (i.e. the one we're navigating away from on a back/forward
@@ -137,7 +137,10 @@ export const visit = async (
   // itself is about to be mutated by the merge below.
   from = { ...from, document: document.cloneNode(true) as Document }
 
-  if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
+  if (morphHeads)
+    Idiomorph.morph(document.head, newDocument.head, {
+      head: { style: 'append' },
+    })
 
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
     newEl.getAttribute(`${config.prefix}ajax-merge`) ||
