@@ -13,7 +13,7 @@ test('page visit works', async ({ page }) => {
   await expect(page).toHaveURL('/example/index.html')
 })
 
-test('before-render can delay dom swap', async ({ page }) => {
+test('before-swap can delay dom swap', async ({ page }) => {
   await page.goto('/example/index.html')
 
   await page.evaluate(() => {
@@ -22,7 +22,7 @@ test('before-render can delay dom swap', async ({ page }) => {
     // @ts-ignore
     window.resumeRender = () => resumeRender?.()
 
-    document.addEventListener('ajax:before-render', (event) => {
+    document.addEventListener('ajax:before-swap', (event) => {
       const customEvent = event as CustomEvent<{
         waitUntil: (promise: Promise<unknown>) => void
       }>
@@ -103,9 +103,9 @@ test('events receive from/to page state', async ({ page }) => {
       })
     }
     document.addEventListener('ajax:before-visit', record('before-visit'))
-    document.addEventListener('ajax:before-render', record('before-render'))
-    document.addEventListener('ajax:render', record('render'))
-    document.addEventListener('ajax:visit', record('visit'))
+    document.addEventListener('ajax:before-swap', record('before-swap'))
+    document.addEventListener('ajax:after-swap', record('after-swap'))
+    document.addEventListener('ajax:load', record('load'))
   })
 
   await page.locator('#about-link').click()
@@ -120,21 +120,21 @@ test('events receive from/to page state', async ({ page }) => {
     toIsDocument: false,
     isBackForward: false,
   })
-  expect(events['before-render']).toEqual({
+  expect(events['before-swap']).toEqual({
     fromUrl: '/example/index.html',
     toUrl: '/example/about.html',
     fromIsDocument: true,
     toIsDocument: true,
     isBackForward: false,
   })
-  expect(events['render']).toEqual({
+  expect(events['after-swap']).toEqual({
     fromUrl: '/example/index.html',
     toUrl: '/example/about.html',
     fromIsDocument: true,
     toIsDocument: true,
     isBackForward: false,
   })
-  expect(events['visit']).toEqual({
+  expect(events['load']).toEqual({
     fromUrl: '/example/index.html',
     toUrl: '/example/about.html',
     fromIsDocument: true,

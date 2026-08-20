@@ -7,6 +7,7 @@ export interface AjaxState extends Record<string, unknown> {
   regions?: string[]
 }
 
+/** Also accepts all `Config` options, e.g. `merge`, `scrollBehavior`, etc. */
 export interface VisitOptions extends Config {
   action?: 'push' | 'replace' | 'none'
   isBackForward?: boolean
@@ -84,10 +85,10 @@ type Payload = {
 }
 
 export type EventMap = {
-  visit: { from: PageState; to: PageState; isBackForward: boolean }
+  load: { from: PageState; to: PageState; isBackForward: boolean }
   'before-visit': Payload
-  'before-render': Payload
-  render: Payload
+  'before-swap': Payload
+  'after-swap': Payload
 }
 
 type DomEventMap = {

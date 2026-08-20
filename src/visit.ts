@@ -130,7 +130,7 @@ export const visit = async (
   const from = { url: fromUrl, state: fromState, document }
   const to = { url, state, document: newDocument }
 
-  await emit('before-render', { from, to, isBackForward, signal })
+  await emit('before-swap', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
   if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
@@ -203,12 +203,12 @@ export const visit = async (
   } else if (viewTransitions && document.startViewTransition) {
     await document.startViewTransition(async () => {
       await mergeRegions()
-      await emit('render', { from, to, isBackForward, signal })
+      await emit('after-swap', { from, to, isBackForward, signal })
       applyScrollBehavior()
     }).ready
   } else {
     await mergeRegions()
-    await emit('render', { from, to, isBackForward, signal })
+    await emit('after-swap', { from, to, isBackForward, signal })
     applyScrollBehavior()
   }
 
@@ -216,5 +216,5 @@ export const visit = async (
 
   // `preventScroll` avoids fighting with `scrollBehavior`.
   if (autoFocus) autoFocusEl?.focus({ preventScroll: true })
-  emit('visit', { from, to, isBackForward })
+  emit('load', { from, to, isBackForward })
 }
