@@ -133,8 +133,6 @@ export const visit = async (
   await emit('before-swap', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
-  if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
-
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
     newEl.getAttribute(`${config.prefix}merge`) ||
     oldEl.getAttribute(`${config.prefix}merge`) ||
@@ -199,14 +197,20 @@ export const visit = async (
   }
 
   if (config.render) {
+    if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
     await config.render(newDocument)
   } else if (viewTransitions && document.startViewTransition) {
+    // Morph the head inside the callback so the browser's old-state snapshot
+    // (taken synchronously when `startViewTransition` is called) still
+    // reflects the current page's styles.
     await document.startViewTransition(async () => {
+      if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
       await mergeRegions()
       await emit('after-swap', { from, to, isBackForward, signal })
       applyScrollBehavior()
     }).ready
   } else {
+    if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
     await mergeRegions()
     await emit('after-swap', { from, to, isBackForward, signal })
     applyScrollBehavior()
