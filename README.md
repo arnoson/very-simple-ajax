@@ -3,7 +3,7 @@
 A very simple turbolinks inspired library based on [Idiomorph](https://github.com/bigskysoftware/idiomorph).
 You can use it for progressive enhancements and to give your multi-page websites a SPA-like feel.
 
-💾 only ~3kb (minify and gzip)
+💾 only ~6kb (minify and gzip)
 
 ## Installation
 
@@ -112,12 +112,12 @@ visit('/about', {
 Every visit fires a series of `CustomEvent`s on `document`, each namespaced
 with `ajax:`:
 
-| Event               | Description                                                                    |
-| ------------------- | ------------------------------------------------------------------------------- |
-| `ajax:before-visit` | Fired before the new page is fetched.                                          |
-| `ajax:before-swap`  | Fired after the new document has been loaded, right before it's merged in.     |
-| `ajax:after-swap`   | Fired right after the new content has been merged in.                          |
-| `ajax:load`         | Fired once the whole visit (including scroll/focus handling) has finished.     |
+| Event               | Description                                                                |
+| ------------------- | -------------------------------------------------------------------------- |
+| `ajax:before-visit` | Fired before the new page is fetched.                                      |
+| `ajax:before-swap`  | Fired after the new document has been loaded, right before it's merged in. |
+| `ajax:after-swap`   | Fired right after the new content has been merged in.                      |
+| `ajax:load`         | Fired once the whole visit (including scroll/focus handling) has finished. |
 
 #### Async listeners
 

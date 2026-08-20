@@ -17,6 +17,7 @@
     "dev": "vite",
     "test": "playwright test",
     "test:types": "tsc --noEmit",
+    "size": "esbuild src/index.ts --bundle --minify --format=esm | gzip -c | wc -c",
     "release": "npm run build && npm run test && bumpp"
   },
   "author": "arnoson",
