@@ -127,15 +127,11 @@ export const visit = async (
   if (action === 'replace') history.replaceState(state, '', url)
   else if (action === 'push') history.pushState(state, '', url)
 
-  let from = { url: fromUrl, state: fromState, document }
+  const from = { url: fromUrl, state: fromState, document }
   const to = { url, state, document: newDocument }
 
   await emit('before-render', { from, to, isBackForward, signal })
   if (signal.aborted) return
-
-  // Snapshot the previous document for the `render` event only. `document`
-  // itself is about to be mutated by the merge below.
-  from = { ...from, document: document.cloneNode(true) as Document }
 
   if (morphHeads)
     Idiomorph.morph(document.head, newDocument.head, {
