@@ -1,21 +1,7 @@
-import { component, mount, unmount, signal } from '@very-simple/framework'
-import { useInterval } from '@very-simple/framework/use'
 import ajax from '../src'
-import './counter'
-import './link'
 
-component('interval', () => {
-  let count = signal(0)
-  useInterval(() => count.value++, 1000)
-  return { count }
-})
-
-ajax.start({ mount, unmount, prefix: '#' })
-mount()
-
-// This is only needed for testing.
+// Exposed for manual/debugging use in the browser console and in tests.
 // @ts-ignore
 window.ajax = ajax
-const root = document.documentElement
-const count = parseInt(root.dataset.headScriptCount ?? '0') + 1
-root.dataset.headScriptCount = `${count}`
+
+ajax.start()

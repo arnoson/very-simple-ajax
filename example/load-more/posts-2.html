@@ -5,19 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="simple-container" content="#container" />
-    <script src="./index.ts" type="module" defer></script>
+    <script src="/example/index.ts" type="module" defer></script>
     <link rel="stylesheet" href="/example/index.css" />
     <title>Posts</title>
   </head>
   <body>
     <div id="progress"></div>
     <h1>Posts</h1>
-    <div id="posts" #ajax-merge="append">
-      <article tabindex="-1" #ajax-autofocus>7. Lore Ipsum</article>
+    <div id="posts" data-ajax-merge="append">
+      <article tabindex="-1" data-ajax-autofocus>7. Lore Ipsum</article>
       <article>8. Lore Ipsum</article>
       <article>9. Lore Ipsum</article>
     </div>
-    <div id="load-more" #ajax-merge="replace">
+    <div id="load-more" data-ajax-merge="replace">
       <!-- Nothing more to load. -->
     </div>
   </body>

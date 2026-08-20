@@ -15,19 +15,19 @@
     <nav>
       <ul>
         <li>
-          <a #component="link" href="/example/about.html">About</a>
+          <a id="about-link" href="/example/about.html">About</a>
         </li>
         <li>
-          <a #component="link" href="/example/delay.html"> Delayed Page </a>
+          <a href="/example/delay.html"> Delayed Page </a>
         </li>
         <li>
-          <a #component="link" href="/example/redirect.html"> Redirect </a>
+          <a href="/example/redirect.html"> Redirect </a>
         </li>
         <li>
           <a id="plain-link" href="/example/about.html">Plain Link</a>
         </li>
         <li>
-          <a id="reload-link" #ajax-reload href="/example/about.html">
+          <a id="reload-link" data-ajax-reload href="/example/about.html">
             Reload Link
           </a>
         </li>
@@ -39,7 +39,7 @@
         <li>
           <a
             id="region-link"
-            #ajax-regions="#heading"
+            data-ajax-regions="#heading"
             href="/example/about.html"
           >
             Region Link
@@ -48,21 +48,23 @@
         <li>
           <a
             id="state-link"
-            #ajax-state='{"template":"custom"}'
+            data-ajax-state='{"template":"custom"}'
             href="/example/about.html"
           >
             State Link
           </a>
         </li>
         <li>
-          <a id="merge-link" #ajax-merge="update" href="/example/about.html">
+          <a
+            id="merge-link"
+            data-ajax-merge="update"
+            href="/example/about.html"
+          >
             Merge Link
           </a>
         </li>
       </ul>
     </nav>
-
-    <div #component="interval"></div>
 
     <h1 id="heading">Home</h1>
     <script>

@@ -133,10 +133,7 @@ export const visit = async (
   await emit('before-render', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
-  if (morphHeads)
-    Idiomorph.morph(document.head, newDocument.head, {
-      head: { style: 'append' },
-    })
+  if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
 
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
     newEl.getAttribute(`${config.prefix}ajax-merge`) ||

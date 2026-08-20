@@ -5,22 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="simple-container" content="#container" />
-    <script src="./index.ts" type="module" defer></script>
+    <script src="/example/index.ts" type="module" defer></script>
     <link rel="stylesheet" href="/example/index.css" />
     <title>Posts</title>
   </head>
   <body>
     <div id="progress"></div>
     <h1>Posts</h1>
-    <div id="posts" #ajax-merge="append">
+    <div id="posts" data-ajax-merge="append">
       <article>1. Lore Ipsum</article>
       <article>2. Lore Ipsum</article>
       <article>3. Lore Ipsum</article>
     </div>
     <a
       id="load-more"
-      #ajax-merge="replace"
-      #component="load-more"
+      data-ajax-action="none"
+      data-ajax-merge="replace"
+      data-ajax-regions="#posts, #load-more"
       href="/example/load-more/posts-1.html"
     >
       More

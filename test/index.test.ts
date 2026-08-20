@@ -4,7 +4,7 @@ test('page visit works', async ({ page }) => {
   await page.goto('/example/index.html')
   await expect(page).toHaveTitle(/Very Simple Ajax/)
 
-  await page.locator("a[href='/example/about.html'][\\#component]").click()
+  await page.locator('#about-link').click()
   await expect(page).toHaveURL('/example/about.html')
   await expect(page).toHaveTitle(/About/)
   expect(await page.locator('h1').innerText()).toBe('About')
@@ -35,7 +35,7 @@ test('before-render can delay dom swap', async ({ page }) => {
     })
   })
 
-  await page.locator("a[href='/example/about.html'][\\#component]").click()
+  await page.locator('#about-link').click()
 
   // The URL updates immediately (like native browser navigation), even
   // though the dom swap is still delayed by `waitUntil`.
@@ -108,7 +108,7 @@ test('events receive from/to page state', async ({ page }) => {
     document.addEventListener('ajax:visit', record('visit'))
   })
 
-  await page.locator("a[href='/example/about.html'][\\#component]").click()
+  await page.locator('#about-link').click()
   await expect(page).toHaveURL('/example/about.html')
   await expect.poll(() => Object.keys(events).length).toBe(4)
 
@@ -296,7 +296,7 @@ test('links with the ajax-action attribute override the default push action', as
 }) => {
   await page.goto('/example/index.html')
 
-  await page.locator("a[href='/example/about.html'][\\#component]").click()
+  await page.locator('#about-link').click()
   await expect(page).toHaveURL('/example/about.html')
 
   await page.locator('#replace-link').click()

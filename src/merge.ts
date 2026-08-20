@@ -56,7 +56,7 @@ export const merge = (
     autoFocusEl = result.autoFocusEl
   }
 
-  // Find the first auto focus element, where [#ajax-autofocus] wins over
+  // Find the first auto focus element, where [ajax-autofocus] wins over
   // [autofocus]. First test the new region itself ...
   if (
     newRegion.hasAttribute(`${prefix}ajax-autofocus`) ||
@@ -153,7 +153,7 @@ const morph = (container: Element, newContainer: Element) => {
     mount?.(newEl)
   }
 
-  // Find the first auto focus element, where [#ajax-autofocus] wins over
+  // Find the first auto focus element, where [ajax-autofocus] wins over
   // [autofocus].
   const autoFocusEl =
     autoFocusEls.find((el) => el.hasAttribute(`${prefix}ajax-autofocus`)) ??
