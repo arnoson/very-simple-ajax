@@ -58,10 +58,7 @@ export const merge = (
 
   // Find the first auto focus element, where [ajax-autofocus] wins over
   // [autofocus]. First test the new region itself ...
-  if (
-    newRegion.hasAttribute(`${prefix}autofocus`) ||
-    newRegion.autofocus
-  ) {
+  if (newRegion.hasAttribute(`${prefix}autofocus`) || newRegion.autofocus) {
     autoFocusEl ??= newRegion
   }
   // ... then look into it's children.
