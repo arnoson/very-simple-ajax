@@ -9,7 +9,7 @@ export interface AjaxState extends Record<string, unknown> {
 
 /** Also accepts all `Config` options, e.g. `merge`, `scrollBehavior`, etc. */
 export interface VisitOptions extends Config {
-  action?: 'push' | 'replace' | 'none'
+  history?: 'push' | 'replace' | 'none'
   isBackForward?: boolean
   autoFocus?: boolean
   request?: RequestInit

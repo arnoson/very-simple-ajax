@@ -51,12 +51,12 @@ export const scrollPositions = new Map<string, ScrollPosition>()
 
 /**
  * Load a new page, merge the regions/bodies and add a new history entry
- * according to the action.
+ * according to the history mode.
  */
 export const visit = async (
   url: string,
   {
-    action = 'none',
+    history: historyMode = 'none',
     isBackForward = false,
     autoFocus = true,
     request,
@@ -82,7 +82,7 @@ export const visit = async (
 
   // Mimic browser behavior: navigating to the already-active URL should not
   // create a new history entry.
-  if (url === currentUrl) action = 'none'
+  if (url === currentUrl) historyMode = 'none'
 
   await emit('before-visit', {
     from: { url: fromUrl, state: fromState, document },
@@ -124,8 +124,8 @@ export const visit = async (
   currentUrl = url
   currentState = state
 
-  if (action === 'replace') history.replaceState(state, '', url)
-  else if (action === 'push') history.pushState(state, '', url)
+  if (historyMode === 'replace') history.replaceState(state, '', url)
+  else if (historyMode === 'push') history.pushState(state, '', url)
 
   const from = { url: fromUrl, state: fromState, document }
   const to = { url, state, document: newDocument }

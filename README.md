@@ -36,7 +36,7 @@ without writing any JavaScript:
 | ------------------- | ------------------------------------------------------------------------------------ |
 | `data-ajax-reload`  | Opt out of interception entirely; the browser performs a normal navigation/submit.   |
 | `data-ajax-regions` | Comma separated list of selectors to swap instead of the whole `<body>`.             |
-| `data-ajax-action`  | History action to use: `push`, `replace` or `none`.                                  |
+| `data-ajax-history` | History mode to use: `push`, `replace` or `none`.                                    |
 | `data-ajax-merge`   | Merge strategy for the swapped content, e.g. `morph`, `replace`, `before`, `append`. |
 | `data-ajax-state`   | JSON encoded state to store in `history.state` for this visit.                       |
 
@@ -93,8 +93,8 @@ response to a custom event or timer instead of a link click:
 import { visit } from '@very-simple/ajax'
 
 visit('/about', {
-  // History action to use: `push`, `replace` or `none`.
-  action: 'push',
+  // History mode to use: `push`, `replace` or `none`.
+  history: 'push',
   // Selectors to swap instead of the whole `<body>`.
   regions: ['#content'],
   // State to store in `history.state` for this visit.
@@ -173,7 +173,7 @@ page's link:
 <a
   id="load-more"
   href="/posts?page=2"
-  data-ajax-action="none"
+  data-ajax-history="none"
   data-ajax-regions="#posts, #load-more"
 >
   More
@@ -193,7 +193,7 @@ page untouched:
 ```html
 <dialog id="preview"></dialog>
 
-<a href="/posts/1" data-ajax-regions="#preview" data-ajax-action="none">
+<a href="/posts/1" data-ajax-regions="#preview" data-ajax-history="none">
   Preview
 </a>
 ```

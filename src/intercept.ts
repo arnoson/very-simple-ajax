@@ -23,7 +23,7 @@ export const interceptLinks = () => {
       return
 
     e.preventDefault()
-    visit(link.href, { action: 'push', ...getVisitOptions(link) })
+    visit(link.href, { history: 'push', ...getVisitOptions(link) })
   })
 }
 
@@ -76,7 +76,7 @@ export const interceptForms = () => {
     }
 
     e.preventDefault()
-    visit(url, { action: 'push', ...getVisitOptions(form), request })
+    visit(url, { history: 'push', ...getVisitOptions(form), request })
   })
 }
 
@@ -93,7 +93,7 @@ export const interceptHistory = () => {
     // to) since those are the regions that were used to reach the current
     // page and describe the diff between it and the target page.
     visit(window.location.href, {
-      action: 'none',
+      history: 'none',
       isBackForward: true,
       regions: currentState?.regions ?? [],
       state: event.state,
@@ -109,14 +109,14 @@ const isModifiedClick = (e: MouseEvent) =>
 
 const getVisitOptions = (
   el: Element,
-): Partial<Pick<VisitOptions, 'action' | 'regions' | 'state' | 'merge'>> => {
+): Partial<Pick<VisitOptions, 'history' | 'regions' | 'state' | 'merge'>> => {
   const prefix = config.prefix
   const options: Partial<
-    Pick<VisitOptions, 'action' | 'regions' | 'state' | 'merge'>
+    Pick<VisitOptions, 'history' | 'regions' | 'state' | 'merge'>
   > = {}
 
-  const action = el.getAttribute(`${prefix}action`)
-  if (action) options.action = action as VisitOptions['action']
+  const historyAttr = el.getAttribute(`${prefix}history`)
+  if (historyAttr) options.history = historyAttr as VisitOptions['history']
 
   const regions = el.getAttribute(`${prefix}regions`)
   if (regions) {

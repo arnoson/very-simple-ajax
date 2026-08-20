@@ -77,7 +77,7 @@ test('manual navigation works', async ({ page }) => {
   await page.goto('/example/index.html')
   await page.evaluate(() =>
     // @ts-ignore
-    window.ajax.visit('/example/about.html', { action: 'push' }),
+    window.ajax.visit('/example/about.html', { history: 'push' }),
   )
   await expect(page).toHaveURL('/example/about.html')
 })
@@ -291,7 +291,7 @@ test('links with the ajax-state attribute set custom history state', async ({
   expect(state.template).toBe('custom')
 })
 
-test('links with the ajax-action attribute override the default push action', async ({
+test('links with the ajax-history attribute override the default push action', async ({
   page,
 }) => {
   await page.goto('/example/index.html')
