@@ -1,4 +1,5 @@
 import { LoadingOptions } from './types'
+import { config } from './config'
 
 const parser = new DOMParser()
 let currentLoadController: AbortController | undefined
@@ -81,7 +82,7 @@ const setProgress = (value: number) => {
 }
 
 const toggleProgress = (state: boolean) =>
-  document.documentElement.toggleAttribute('data-ajax-progress', state)
+  document.documentElement.toggleAttribute(`${config.prefix}progress`, state)
 
 const toggleLoading = (state: boolean) =>
-  document.documentElement.toggleAttribute('data-ajax-loading', state)
+  document.documentElement.toggleAttribute(`${config.prefix}loading`, state)

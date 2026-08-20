@@ -7,7 +7,7 @@ import { config } from './config'
  * keeps an existing node across visits.
  */
 export const executeScripts = (container: Element): Promise<unknown> => {
-  const marker = `${config.prefix}ajax-script-executed`
+  const marker = `${config.prefix}script-executed`
   const waiting: Promise<unknown>[] = []
 
   for (const script of container.querySelectorAll('script')) {

@@ -12,5 +12,5 @@ export const config: InternalConfig = {
   viewTransitions: false,
   loadingDelay: 500,
   progressHideDelay: 500,
-  prefix: 'data-',
+  prefix: 'data-ajax-',
 }

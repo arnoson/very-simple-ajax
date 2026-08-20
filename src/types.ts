@@ -34,16 +34,27 @@ export type MergeStrategy =
   | 'update'
 
 export interface Config {
+  /** Strategy used to merge the swapped content into the current DOM. */
   merge?: MergeStrategy
+  /** Morph the `<head>` instead of leaving it untouched. */
   morphHeads?: boolean
+  /** Re-execute `<script>` tags found in the swapped content. */
   executeScripts?: boolean
+  /** Wrap navigations in the View Transitions API, if supported. */
   viewTransitions?: boolean
+  /** Called instead of the default merge to render the new document. */
   render?: (newDocument: Document) => Promise<void> | void
+  /** Custom scroll handling, e.g. restoring position on back/forward visits. */
   scrollBehavior?: ScrollBehavior
+  /** Delay (ms) before showing a loading indicator on slow visits. */
   loadingDelay?: number
+  /** Delay (ms) before hiding the loading indicator again. */
   progressHideDelay?: number
+  /** Prefix used for the `data-ajax-*` attributes. */
   prefix?: string
+  /** Called after an element is added to the DOM by a merge. */
   mount?: (el: Element) => void
+  /** Called before an element is removed from the DOM by a merge. */
   unmount?: (el: Element) => void
 }
 

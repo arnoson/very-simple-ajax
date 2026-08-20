@@ -16,7 +16,7 @@ export const merge = (
     // Extract permanents before unmounting so their components stay alive.
     const permanents = new Map<string, Element>()
     Array.from(
-      newRegion.querySelectorAll(`[${escapedPrefix}ajax-permanent][id]`),
+      newRegion.querySelectorAll(`[${escapedPrefix}permanent][id]`),
     ).forEach((el) => {
       const original = region.querySelector(`#${el.id}`)
       if (original) {
@@ -32,7 +32,7 @@ export const merge = (
 
     // Re-insert permanents into the new content.
     Array.from(
-      newRegion.querySelectorAll(`[${escapedPrefix}ajax-permanent][id]`),
+      newRegion.querySelectorAll(`[${escapedPrefix}permanent][id]`),
     ).forEach((el) => {
       const original = permanents.get(el.id)
       if (original) el.replaceWith(original)
@@ -59,14 +59,14 @@ export const merge = (
   // Find the first auto focus element, where [ajax-autofocus] wins over
   // [autofocus]. First test the new region itself ...
   if (
-    newRegion.hasAttribute(`${prefix}ajax-autofocus`) ||
+    newRegion.hasAttribute(`${prefix}autofocus`) ||
     newRegion.autofocus
   ) {
     autoFocusEl ??= newRegion
   }
   // ... then look into it's children.
   autoFocusEl ??=
-    newRegion.querySelector<HTMLElement>(`[${escapedPrefix}ajax-autofocus]`) ??
+    newRegion.querySelector<HTMLElement>(`[${escapedPrefix}autofocus]`) ??
     newRegion.querySelector<HTMLElement>('[autofocus]') ??
     undefined
 
@@ -95,7 +95,7 @@ const morph = (container: Element, newContainer: Element) => {
 
         // Check if the old node is permanent and the new one is matching.
         if (
-          oldNode.hasAttribute(`${prefix}ajax-permanent`) &&
+          oldNode.hasAttribute(`${prefix}permanent`) &&
           oldNode.id === newNode.id
         )
           return false
@@ -122,7 +122,7 @@ const morph = (container: Element, newContainer: Element) => {
       beforeNodeRemoved(node: Node) {
         if (
           node instanceof Element &&
-          !node.hasAttribute(`${prefix}ajax-permanent`)
+          !node.hasAttribute(`${prefix}permanent`)
         ) {
           unmount?.(node)
         }
@@ -139,7 +139,7 @@ const morph = (container: Element, newContainer: Element) => {
       afterNodeMorphed(_: Node, newNode: Node) {
         if (
           newNode instanceof HTMLElement &&
-          (newNode.autofocus || newNode.hasAttribute(`${prefix}ajax-autofocus`))
+          (newNode.autofocus || newNode.hasAttribute(`${prefix}autofocus`))
         ) {
           autoFocusEls.push(newNode)
         }
@@ -156,7 +156,7 @@ const morph = (container: Element, newContainer: Element) => {
   // Find the first auto focus element, where [ajax-autofocus] wins over
   // [autofocus].
   const autoFocusEl =
-    autoFocusEls.find((el) => el.hasAttribute(`${prefix}ajax-autofocus`)) ??
+    autoFocusEls.find((el) => el.hasAttribute(`${prefix}autofocus`)) ??
     autoFocusEls.find((el) => el.autofocus)
 
   return { autoFocusEl }

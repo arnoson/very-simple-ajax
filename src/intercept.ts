@@ -12,7 +12,7 @@ export const interceptLinks = () => {
     const link = target?.closest?.('a')
     if (!link || !link.href) return
 
-    const isOptOut = link.hasAttribute(`${config.prefix}ajax-reload`)
+    const isOptOut = link.hasAttribute(`${config.prefix}reload`)
     const isExternalTarget = link.target && link.target !== '_self'
     if (
       isOptOut ||
@@ -33,7 +33,7 @@ export const interceptForms = () => {
     if (
       e.defaultPrevented ||
       !(form instanceof HTMLFormElement) ||
-      form.hasAttribute(`${config.prefix}ajax-reload`)
+      form.hasAttribute(`${config.prefix}reload`)
     )
       return
 
@@ -115,10 +115,10 @@ const getVisitOptions = (
     Pick<VisitOptions, 'action' | 'regions' | 'state' | 'merge'>
   > = {}
 
-  const action = el.getAttribute(`${prefix}ajax-action`)
+  const action = el.getAttribute(`${prefix}action`)
   if (action) options.action = action as VisitOptions['action']
 
-  const regions = el.getAttribute(`${prefix}ajax-regions`)
+  const regions = el.getAttribute(`${prefix}regions`)
   if (regions) {
     options.regions = regions
       .split(',')
@@ -126,16 +126,16 @@ const getVisitOptions = (
       .filter(Boolean)
   }
 
-  const state = el.getAttribute(`${prefix}ajax-state`)
+  const state = el.getAttribute(`${prefix}state`)
   if (state) {
     try {
       options.state = JSON.parse(state)
     } catch {
-      console.error(`Invalid ${prefix}ajax-state on`, el)
+      console.error(`Invalid ${prefix}state on`, el)
     }
   }
 
-  const merge = el.getAttribute(`${prefix}ajax-merge`)
+  const merge = el.getAttribute(`${prefix}merge`)
   if (merge) options.merge = merge as MergeStrategy
 
   return options
