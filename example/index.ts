@@ -1,4 +1,4 @@
-import ajax from '../src'
+import * as ajax from '../src'
 
 // Exposed for manual/debugging use in the browser console and in tests.
 // @ts-ignore
