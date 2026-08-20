@@ -107,6 +107,55 @@ visit('/about', {
 })
 ```
 
+### Events
+
+Every visit fires a series of `CustomEvent`s on `document`, each namespaced
+with `ajax:`:
+
+| Event               | Description                                                                    |
+| ------------------- | ------------------------------------------------------------------------------- |
+| `ajax:before-visit` | Fired before the new page is fetched.                                          |
+| `ajax:before-swap`  | Fired after the new document has been loaded, right before it's merged in.     |
+| `ajax:after-swap`   | Fired right after the new content has been merged in.                          |
+| `ajax:load`         | Fired once the whole visit (including scroll/focus handling) has finished.     |
+
+#### Async listeners
+
+Use `event.detail.waitUntil(promise)` on those same events to delay the
+visit until the given promise settles, e.g. to run an animation before
+continuing:
+
+```ts
+document.addEventListener('ajax:before-swap', (e) => {
+  e.detail.waitUntil(animateIn())
+})
+```
+
+#### Aborting
+
+`before-visit`, `before-swap` and `after-swap` carry an `AbortSignal` in
+`event.detail.signal`, which is aborted if the visit gets superseded by a
+newer one (e.g. the user clicks another link while yours is still running).
+If your listener does anything that isn't automatically cancelled, like a
+manual animation loop, check `signal.aborted` (or listen for the signal's
+`abort` event) to stop it early:
+
+```ts
+document.addEventListener('ajax:before-swap', (e) => {
+  const { signal } = e.detail
+  const stopWhenAborted = () => (running = false)
+  signal.addEventListener('abort', stopWhenAborted)
+
+  let running = true
+  const loop = () => {
+    if (!running) return
+    // ...do some animation work...
+    requestAnimationFrame(loop)
+  }
+  loop()
+})
+```
+
 ## Common patterns
 
 ### Load more
