@@ -307,3 +307,27 @@ test('links with the ajax-history attribute override the default push action', a
   await page.goBack()
   await expect(page).toHaveURL('/example/index.html')
 })
+
+test('the regions option in start() sets default regions for all visits', async ({
+  page,
+}) => {
+  await page.goto('/example/default-regions/index.html')
+
+  // Tag the menu so we can tell if it was swapped even though its content
+  // doesn't change between pages.
+  const hash = crypto.getRandomValues(new Uint8Array(20)).join('')
+  await page.evaluate((hash) => {
+    // @ts-ignore
+    document.querySelector<HTMLElement>('#menu')!.$hash = hash
+  }, hash)
+
+  await page.locator('#other-link').click()
+  await expect(page).toHaveURL('/example/default-regions/other.html')
+  await expect(page.locator('#heading')).toHaveText('Other')
+
+  const newHash = await page.evaluate(
+    // @ts-ignore
+    () => document.querySelector<HTMLElement>('#menu')!.$hash,
+  )
+  expect(newHash).toBe(hash)
+})

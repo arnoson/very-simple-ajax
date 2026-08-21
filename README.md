@@ -74,6 +74,9 @@ start({
   progressHideDelay: 500,
   // Prefix used for the `data-ajax-*` attributes.
   prefix: 'data-ajax-',
+  // Default selectors to swap instead of the whole `<body>`, used for visits
+  // that don't specify their own `regions` (e.g. via `data-ajax-regions`).
+  regions: [],
   // Custom scroll handling, e.g. restoring position on back/forward visits.
   scrollBehavior: ({ isBackForward, savedPosition }) =>
     isBackForward ? savedPosition : { top: 0 },

@@ -95,7 +95,7 @@ export const interceptHistory = () => {
     visit(window.location.href, {
       history: 'none',
       isBackForward: true,
-      regions: currentState?.regions ?? [],
+      regions: currentState?.regions ?? config.regions,
       state: event.state,
     })
   })

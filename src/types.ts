@@ -53,6 +53,8 @@ export interface Config {
   progressHideDelay?: number
   /** Prefix used for the `data-ajax-*` attributes. */
   prefix?: string
+  /** Default regions used for visits that don't specify their own. */
+  regions?: string[]
   /** Called after an element is added to the DOM by a merge. */
   mount?: (el: Element) => void
   /** Called before an element is removed from the DOM by a merge. */

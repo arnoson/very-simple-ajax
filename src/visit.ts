@@ -61,7 +61,7 @@ export const visit = async (
     autoFocus = true,
     request,
     state,
-    regions = [],
+    regions = config.regions,
     morphHeads = config.morphHeads,
     merge: mergeStrategy = config.merge,
     executeScripts: shouldExecuteScripts = config.executeScripts,
