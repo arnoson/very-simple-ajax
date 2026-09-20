@@ -91,6 +91,9 @@ export type EventMap = {
   'before-visit': Payload
   'before-swap': Payload
   'after-swap': Payload
+  'progress-start': Record<string, never>
+  progress: { progress: number }
+  'progress-end': Record<string, never>
 }
 
 type DomEventMap = {

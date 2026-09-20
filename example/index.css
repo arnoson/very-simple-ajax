@@ -5,13 +5,9 @@
   top: 0;
   left: 0;
   height: 3px;
-  width: var(--ajax-progress);
+  width: 0;
   transition: width 300ms ease-out;
   background-color: red;
-
-  :root:not([data-ajax-progress]) & {
-    display: none;
-  }
 }
 
 body {

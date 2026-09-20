@@ -1,10 +1,15 @@
-import { LoadingOptions } from './types'
-import { config } from './config'
+import { EventMap, LoadingOptions } from './types'
 
 const parser = new DOMParser()
 let currentLoadController: AbortController | undefined
 let progress = 0
 let trickleInterval: number | undefined
+
+// Progress events are purely informational, so they're dispatched directly
+// rather than through `visit.ts`'s `emit`, which adds `waitUntil`/`signal`
+// semantics that don't apply here.
+const emit = <E extends keyof EventMap>(type: E, payload: EventMap[E]) =>
+  document.dispatchEvent(new CustomEvent(`ajax:${type}`, { detail: payload }))
 
 export const cache = new Map<string, string>()
 
@@ -25,8 +30,7 @@ export const load = async (
     setProgress(0)
     // Only show the progress bar if the page loading takes longer.
     progressDelayTimeout = window.setTimeout(() => {
-      toggleLoading(true)
-      toggleProgress(true)
+      emit('progress-start', {})
       startTrickle()
     }, options.loadingDelay)
 
@@ -56,8 +60,7 @@ export const load = async (
     clearTimeout(progressDelayTimeout)
     stopTrickle()
     setProgress(1)
-    toggleLoading(false)
-    setTimeout(() => toggleProgress(false), options.progressHideDelay)
+    setTimeout(() => emit('progress-end', {}), options.progressHideDelay)
   }
 }
 
@@ -75,14 +78,5 @@ const stopTrickle = () => clearInterval(trickleInterval)
 
 const setProgress = (value: number) => {
   progress = value
-  document.documentElement.style.setProperty(
-    '--ajax-progress',
-    `${Math.round(value * 10000) / 100}%`,
-  )
+  emit('progress', { progress: value })
 }
-
-const toggleProgress = (state: boolean) =>
-  document.documentElement.toggleAttribute(`${config.prefix}progress`, state)
-
-const toggleLoading = (state: boolean) =>
-  document.documentElement.toggleAttribute(`${config.prefix}loading`, state)
