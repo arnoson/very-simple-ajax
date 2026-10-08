@@ -54,6 +54,9 @@ export const merge = (
     autoFocusEl = result.autoFocusEl
   }
 
+  // For morph, newRegion stays detached, so morph() already found the element.
+  if (strategy === 'morph') return { autoFocusEl }
+
   // Find the first auto focus element, where [ajax-autofocus] wins over
   // [autofocus]. First test the new region itself ...
   if (newRegion.hasAttribute(`${prefix}autofocus`) || newRegion.autofocus) {
@@ -132,12 +135,12 @@ const morph = (container: Element, newContainer: Element) => {
           mount?.(node)
         }
       },
-      afterNodeMorphed(_: Node, newNode: Node) {
+      afterNodeMorphed(oldNode: Node) {
         if (
-          newNode instanceof HTMLElement &&
-          (newNode.autofocus || newNode.hasAttribute(`${prefix}autofocus`))
+          oldNode instanceof HTMLElement &&
+          (oldNode.autofocus || oldNode.hasAttribute(`${prefix}autofocus`))
         ) {
-          autoFocusEls.push(newNode)
+          autoFocusEls.push(oldNode)
         }
       },
     },
