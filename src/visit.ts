@@ -117,6 +117,9 @@ export const visit = async (
   // in `load()` trigger a reload.
   if (!newDocument) return
 
+  // A newer visit superseded this one while it was loading (or cached).
+  if (signal.aborted) return
+
   // Commit currentUrl/currentState only once the visit is confirmed to
   // proceed. currentUrl reflects the final URL after potential
   // redirect/hash handling.
