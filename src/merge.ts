@@ -72,7 +72,7 @@ const morph = (container: Element, newContainer: Element) => {
   const { prefix, mount, unmount } = config
 
   const manualReplacements: [Element, Element][] = []
-  let autoFocusEls: HTMLElement[] = []
+  const autoFocusEls: HTMLElement[] = []
 
   // A list of attributes we want to keep unmodified/unremoved during the morph.
   let currentNodeKeepAttributes: string[] = []
@@ -110,6 +110,7 @@ const morph = (container: Element, newContainer: Element) => {
         if (!oldIsComponent || isSameComponent) return true
 
         manualReplacements.push([oldNode, newNode])
+        return false
       },
       beforeAttributeUpdated: (name: string) => {
         return !currentNodeKeepAttributes.includes(name)
