@@ -212,7 +212,7 @@ export const visit = async (
       await mergeRegions()
       await emit('after-swap', { from, to, isBackForward, signal })
       applyScrollBehavior()
-    }).ready
+    }).updateCallbackDone // `ready` rejects when the transition is skipped
   } else {
     if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
     await mergeRegions()
