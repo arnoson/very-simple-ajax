@@ -151,8 +151,12 @@ export const visit = async (
     if (hasMatchingRegions) {
       for (const id of regions) {
         const region = document.querySelector<HTMLElement>(id)
-        const newRegion = newDocument.querySelector<HTMLElement>(id)
-        if (!region || !newRegion) continue
+        const parsedRegion = newDocument.querySelector<HTMLElement>(id)
+        if (!region || !parsedRegion) continue
+        // Import into the live document so media elements (e.g. videos) get a
+        // fresh load instead of inheriting an error state from the inert
+        // parser document.
+        const newRegion = document.importNode(parsedRegion, true)
         const strategy = getMergeStrategy(region, newRegion)
         const result = merge(region, newRegion, strategy as MergeStrategy)
         // Use the auto-focusable element from the first region that has one.
@@ -166,7 +170,7 @@ export const visit = async (
       }
     } else {
       const region = document.body
-      const newRegion = newDocument.body
+      const newRegion = document.importNode(newDocument.body, true)
       const strategy = getMergeStrategy(region, newRegion)
       const result = merge(region, newRegion, strategy as MergeStrategy)
       autoFocusEl = result.autoFocusEl
