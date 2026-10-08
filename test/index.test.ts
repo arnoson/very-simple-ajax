@@ -51,27 +51,33 @@ test('before-swap can delay dom swap', async ({ page }) => {
   await expect(page.locator('h1')).toHaveText('About')
 })
 
-test('permanent elements are kept alive', async ({ page }) => {
-  await page.goto('/example/permanent/index.html')
+for (const strategy of ['update', 'replace']) {
+  test(`permanent elements are kept alive with ${strategy}`, async ({
+    page,
+  }) => {
+    await page.goto('/example/permanent/index.html')
 
-  // I haven't found a way to assert if two DOM nodes are the same. As a
-  // workaround a random hash is created at runtime to identify the DOM node.
-  const hash = crypto.getRandomValues(new Uint8Array(20)).join('')
+    // I haven't found a way to assert if two DOM nodes are the same. As a
+    // workaround a random hash is created at runtime to identify the DOM node.
+    const hash = crypto.getRandomValues(new Uint8Array(20)).join('')
 
-  await page.evaluate((hash) => {
-    // @ts-ignore
-    document.querySelector<HTMLElement>('#interval')!.$hash = hash
-  }, hash)
+    await page.evaluate((hash) => {
+      // @ts-ignore
+      document.querySelector<HTMLElement>('#permanent')!.$hash = hash
+    }, hash)
 
-  await page.locator("a[href='/example/permanent/other.html']").click()
+    await page.locator(`#${strategy}-link`).click()
+    await expect(page).toHaveURL('/example/permanent/other.html')
+    await expect(page.locator('h1')).toHaveText('Other')
 
-  const newHash = await page.evaluate(
-    // @ts-ignore
-    () => document.querySelector<HTMLElement>('#interval')!.$hash,
-  )
+    const newHash = await page.evaluate(
+      // @ts-ignore
+      () => document.querySelector<HTMLElement>('#permanent')!.$hash,
+    )
 
-  expect(newHash).toBe(hash)
-})
+    expect(newHash).toBe(hash)
+  })
+}
 
 test('manual navigation works', async ({ page }) => {
   await page.goto('/example/index.html')

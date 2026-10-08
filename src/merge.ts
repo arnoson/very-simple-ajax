@@ -30,15 +30,13 @@ export const merge = (
     if (strategy === 'replace') region.replaceWith(newRegion)
     else region.replaceChildren(...Array.from(newRegion.children))
 
-    // Re-insert permanents into the new content.
-    Array.from(
-      newRegion.querySelectorAll(`[${escapedPrefix}permanent][id]`),
-    ).forEach((el) => {
+    // Re-insert permanents into the new content (for 'update' it lives in `region`).
+    const target = strategy === 'replace' ? newRegion : region
+    target.querySelectorAll(`[${escapedPrefix}permanent][id]`).forEach((el) => {
       const original = permanents.get(el.id)
       if (original) el.replaceWith(original)
     })
-
-    mount?.(strategy === 'replace' ? newRegion : region)
+    mount?.(target)
   } else if (strategy === 'before') {
     region.insertAdjacentElement('beforebegin', newRegion)
     mount?.(newRegion)

@@ -15,12 +15,27 @@
     <nav>
       <ul>
         <li>
-          <a href="/example/permanent/other.html"> Other </a>
+          <a
+            id="update-link"
+            href="/example/permanent/other.html"
+            data-ajax-merge="update"
+          >
+            Update
+          </a>
+        </li>
+        <li>
+          <a
+            id="replace-link"
+            href="/example/permanent/other.html"
+            data-ajax-merge="replace"
+          >
+            Replace
+          </a>
         </li>
       </ul>
     </nav>
 
-    <div id="interval" data-ajax-permanent>Permanent</div>
+    <textarea id="permanent" data-ajax-permanent>Permanent</textarea>
 
     <h1>Home</h1>
   </body>
