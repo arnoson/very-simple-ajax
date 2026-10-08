@@ -2,6 +2,7 @@ import { EventMap, LoadingOptions } from './types'
 
 const parser = new DOMParser()
 let currentLoadController: AbortController | undefined
+let progressDelayTimeout: number | undefined
 let progress = 0
 let trickleInterval: number | undefined
 
@@ -18,13 +19,14 @@ export const load = async (
   regions: string[],
   options: LoadingOptions,
 ): Promise<{ document: Document; response: Response } | undefined> => {
-  let progressDelayTimeout: number | undefined
+  let aborted = false
 
   try {
     // We only allow one pending request at a time. When triggering a new request
     // while the last one is still pending we mimic browser behavior and cancel
     // the pending one.
     currentLoadController?.abort()
+    clearTimeout(progressDelayTimeout)
     currentLoadController = new AbortController()
 
     setProgress(0)
@@ -49,18 +51,21 @@ export const load = async (
     const document = parseHtml(html)
     return { document, response }
   } catch (e) {
-    setProgress(0)
-    const isAbortError = e instanceof DOMException && e.name === 'AbortError'
-    if (!isAbortError) {
+    aborted = e instanceof DOMException && e.name === 'AbortError'
+    if (!aborted) {
+      setProgress(0)
       // There was a network error. We reload the page so the user sees the
       // browser's network error page.
       window.location.reload()
     }
   } finally {
-    clearTimeout(progressDelayTimeout)
-    stopTrickle()
-    setProgress(1)
-    setTimeout(() => emit('progress-end', {}), options.progressHideDelay)
+    // The newer request owns the progress UI and its delay timer now.
+    if (!aborted) {
+      clearTimeout(progressDelayTimeout)
+      stopTrickle()
+      setProgress(1)
+      setTimeout(() => emit('progress-end', {}), options.progressHideDelay)
+    }
   }
 }
 
@@ -72,9 +77,15 @@ const trickle = () => {
   setProgress(progress + Math.random() * amount)
 }
 
-const startTrickle = () => (trickleInterval = window.setInterval(trickle, 300))
+const startTrickle = () => {
+  stopTrickle()
+  trickleInterval = window.setInterval(trickle, 300)
+}
 
-const stopTrickle = () => clearInterval(trickleInterval)
+const stopTrickle = () => {
+  clearInterval(trickleInterval)
+  trickleInterval = undefined
+}
 
 const setProgress = (value: number) => {
   progress = value
