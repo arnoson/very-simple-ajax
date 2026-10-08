@@ -18,7 +18,7 @@ export const merge = (
     Array.from(
       newRegion.querySelectorAll(`[${escapedPrefix}permanent][id]`),
     ).forEach((el) => {
-      const original = region.querySelector(`#${el.id}`)
+      const original = region.querySelector(`#${CSS.escape(el.id)}`)
       if (original) {
         permanents.set(el.id, original)
         original.remove()
