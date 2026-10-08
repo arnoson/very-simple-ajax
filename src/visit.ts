@@ -37,7 +37,7 @@ const emit = <E extends keyof EventMap>(
   if (waiting.length) return Promise.allSettled(waiting)
 }
 
-export let currentUrl = window.location.pathname
+export let currentUrl = window.location.pathname + window.location.search
 
 // Exported so `interceptHistory` can read the state of the page we're
 // currently on (i.e. the one we're navigating away from on a back/forward
@@ -108,8 +108,7 @@ export const visit = async (
     const result = await load(url, regions, options)
     if (result) {
       newDocument = result.document
-      // Only use the response url if there has been a redirect. Otherwise we
-      // might strip away the original url's hash.
+      // Only use the response url if there has been a redirect.
       url = result.response.redirected ? result.response.url : url
     }
   }
