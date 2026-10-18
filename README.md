@@ -87,6 +87,19 @@ start({
 })
 ```
 
+`morphHeads`, `executeScripts` and `viewTransitions` also accept a callback
+receiving `{ from, to, isBackForward }` and returning a boolean. Combined with
+`data-ajax-state` this allows deciding per link, e.g. to skip morphing the
+`<head>` when loading a partial:
+
+```html
+<a href="/partial" data-ajax-state='{"isPartial": true}'>Partial</a>
+```
+
+```ts
+start({ morphHeads: ({ to }) => !to.state?.isPartial })
+```
+
 ### `visit(url, options?)`
 
 A lower-level API for triggering a visit programmatically, e.g. in

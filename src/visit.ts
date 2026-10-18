@@ -7,6 +7,7 @@ import {
   EventMap,
   MergeStrategy,
   ScrollPosition,
+  Resolvable,
   VisitOptions,
 } from './types'
 // @ts-ignore (missing types)
@@ -64,7 +65,7 @@ export const visit = async (
     regions = config.regions,
     morphHeads = config.morphHeads,
     merge: mergeStrategy = config.merge,
-    executeScripts: shouldExecuteScripts = config.executeScripts,
+    executeScripts: executeScriptsOption = config.executeScripts,
     viewTransitions = config.viewTransitions,
     loadingDelay = config.loadingDelay,
     progressHideDelay = config.progressHideDelay,
@@ -135,6 +136,14 @@ export const visit = async (
   await emit('before-swap', { from, to, isBackForward, signal })
   if (signal.aborted) return
 
+  const resolve = <T>(option: Resolvable<T>): T =>
+    typeof option === 'function'
+      ? (option as Function)({ from, to, isBackForward })
+      : option
+  const shouldMorphHeads = resolve(morphHeads)
+  const shouldExecuteScripts = resolve(executeScriptsOption)
+  const useViewTransitions = resolve(viewTransitions)
+
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
     newEl.getAttribute(`${config.prefix}merge`) ||
     oldEl.getAttribute(`${config.prefix}merge`) ||
@@ -203,20 +212,20 @@ export const visit = async (
   }
 
   if (config.render) {
-    if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
+    if (shouldMorphHeads) Idiomorph.morph(document.head, newDocument.head)
     await config.render(newDocument)
-  } else if (viewTransitions && document.startViewTransition) {
+  } else if (useViewTransitions && document.startViewTransition) {
     // Morph the head inside the callback so the browser's old-state snapshot
     // (taken synchronously when `startViewTransition` is called) still
     // reflects the current page's styles.
     await document.startViewTransition(async () => {
-      if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
+      if (shouldMorphHeads) Idiomorph.morph(document.head, newDocument.head)
       await mergeRegions()
       await emit('after-swap', { from, to, isBackForward, signal })
       applyScrollBehavior()
     }).updateCallbackDone // `ready` rejects when the transition is skipped
   } else {
-    if (morphHeads) Idiomorph.morph(document.head, newDocument.head)
+    if (shouldMorphHeads) Idiomorph.morph(document.head, newDocument.head)
     await mergeRegions()
     await emit('after-swap', { from, to, isBackForward, signal })
     applyScrollBehavior()

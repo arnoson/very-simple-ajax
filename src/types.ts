@@ -37,12 +37,12 @@ export type MergeStrategy =
 export interface Config {
   /** Strategy used to merge the swapped content into the current DOM. */
   merge?: MergeStrategy
-  /** Morph the `<head>` instead of leaving it untouched. */
-  morphHeads?: boolean
-  /** Re-execute `<script>` tags found in the swapped content. */
-  executeScripts?: boolean
-  /** Wrap navigations in the View Transitions API, if supported. */
-  viewTransitions?: boolean
+  /** Morph the `<head>` instead of leaving it untouched. A callback decides per visit. */
+  morphHeads?: Resolvable<boolean>
+  /** Re-execute `<script>` tags found in the swapped content. A callback decides per visit. */
+  executeScripts?: Resolvable<boolean>
+  /** Wrap navigations in the View Transitions API, if supported. A callback decides per visit. */
+  viewTransitions?: Resolvable<boolean>
   /** Called instead of the default merge to render the new document. */
   render?: (newDocument: Document) => Promise<void> | void
   /** Custom scroll handling, e.g. restoring position on back/forward visits. */
@@ -60,6 +60,11 @@ export interface Config {
   /** Called before an element is removed from the DOM by a merge. */
   unmount?: (el: Element) => void
 }
+
+/** A value, or a callback resolving it right before the swap. */
+export type Resolvable<T> =
+  | T
+  | ((info: { from: PageState; to: PageState; isBackForward: boolean }) => T)
 
 export type ScrollPosition = { top: number }
 
