@@ -34,11 +34,18 @@ export type MergeStrategy =
   | 'append'
   | 'update'
 
+/** `true` is `'merge'`, `false` is `'none'`. */
+export type HeadMode = 'merge' | 'append' | 'morph' | 'none' | boolean
+
 export interface Config {
   /** Strategy used to merge the swapped content into the current DOM. */
   merge?: MergeStrategy
-  /** Morph the `<head>` instead of leaving it untouched. A callback decides per visit. */
-  morphHeads?: Resolvable<boolean>
+  /**
+   * How to update the `<head>`: `'merge'` adds new and removes stale elements,
+   * `'append'` only adds new ones, `'morph'` morphs it like any element and
+   * `'none'` leaves it untouched. A callback decides per visit.
+   */
+  head?: Resolvable<HeadMode>
   /** Re-execute `<script>` tags found in the swapped content. A callback decides per visit. */
   executeScripts?: Resolvable<boolean>
   /** Wrap navigations in the View Transitions API, if supported. A callback decides per visit. */

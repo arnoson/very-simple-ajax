@@ -1,13 +1,13 @@
 import { expect, test } from '@playwright/test'
 
-test('morphHeads callback can skip morphing the head', async ({ page }) => {
+test('head callback can skip morphing the head', async ({ page }) => {
   await page.goto('/example/index.html')
 
   await page.evaluate(() =>
     // @ts-ignore
     window.ajax.visit('/example/about.html', {
       history: 'push',
-      morphHeads: () => false,
+      head: () => 'none',
     }),
   )
 
@@ -16,7 +16,7 @@ test('morphHeads callback can skip morphing the head', async ({ page }) => {
   await expect(page).toHaveTitle(/Very Simple Ajax/)
 })
 
-test('morphHeads callback receives from/to state and isBackForward', async ({
+test('head callback receives from/to state and isBackForward', async ({
   page,
 }) => {
   await page.goto('/example/index.html')
@@ -27,14 +27,14 @@ test('morphHeads callback receives from/to state and isBackForward', async ({
     await window.ajax.visit('/example/about.html', {
       history: 'push',
       state: { isPartial: true },
-      morphHeads: (i: any) => {
+      head: (i: any) => {
         received = {
           fromUrl: i.from.url,
           toUrl: i.to.url,
           isPartial: i.to.state.isPartial,
           isBackForward: i.isBackForward,
         }
-        return true
+        return 'merge'
       },
     })
     return received
@@ -49,14 +49,14 @@ test('morphHeads callback receives from/to state and isBackForward', async ({
   await expect(page).toHaveTitle(/About/)
 })
 
-test('morphHeads callback can decide based on data-ajax-state', async ({
-  page,
-}) => {
+test('head callback can decide based on data-ajax-state', async ({ page }) => {
   await page.goto('/example/index.html')
 
   await page.evaluate(() => {
     // @ts-ignore
-    window.ajax.start({ morphHeads: ({ to }: any) => !to.state?.isPartial })
+    window.ajax.start({
+      head: ({ to }: any) => (to.state?.isPartial ? 'none' : 'merge'),
+    })
   })
 
   await page.evaluate(() => {

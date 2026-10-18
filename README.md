@@ -62,8 +62,8 @@ import { start } from '@very-simple/ajax'
 start({
   // Strategy used to merge the swapped content into the current DOM.
   merge: 'replace',
-  // Morph the `<head>` instead of leaving it untouched.
-  morphHeads: true,
+  // How to update the `<head>`: 'merge', 'append', 'morph' or 'none'.
+  head: 'merge',
   // Re-execute `<script>` tags found in the swapped content.
   executeScripts: true,
   // Wrap navigations in the View Transitions API, if supported.
@@ -87,17 +87,17 @@ start({
 })
 ```
 
-`morphHeads`, `executeScripts` and `viewTransitions` also accept a callback
-receiving `{ from, to, isBackForward }` and returning a boolean. Combined with
-`data-ajax-state` this allows deciding per link, e.g. to skip morphing the
-`<head>` when loading a partial:
+`head`, `executeScripts` and `viewTransitions` also accept a callback
+receiving `{ from, to, isBackForward }`. Combined with `data-ajax-state` this
+allows deciding per link, e.g. to only add new `<head>` elements (scripts,
+styles) without removing existing ones when loading a partial:
 
 ```html
 <a href="/partial" data-ajax-state='{"isPartial": true}'>Partial</a>
 ```
 
 ```ts
-start({ morphHeads: ({ to }) => !to.state?.isPartial })
+start({ head: ({ to }) => (to.state?.isPartial ? 'append' : 'merge') })
 ```
 
 ### `visit(url, options?)`

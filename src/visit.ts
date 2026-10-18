@@ -63,7 +63,7 @@ export const visit = async (
     request,
     state,
     regions = config.regions,
-    morphHeads = config.morphHeads,
+    head = config.head,
     merge: mergeStrategy = config.merge,
     executeScripts: executeScriptsOption = config.executeScripts,
     viewTransitions = config.viewTransitions,
@@ -140,7 +140,16 @@ export const visit = async (
     typeof option === 'function'
       ? (option as Function)({ from, to, isBackForward })
       : option
-  const shouldMorphHeads = resolve(morphHeads)
+  const resolvedHead = resolve(head)
+  let headStyle = resolvedHead
+  if (headStyle === true) headStyle = 'merge'
+  else if (headStyle === false) headStyle = 'none'
+  const updateHead = () => {
+    if (headStyle === 'none') return
+    Idiomorph.morph(document.head, newDocument.head, {
+      head: { style: headStyle },
+    })
+  }
   const shouldExecuteScripts = resolve(executeScriptsOption)
   const useViewTransitions = resolve(viewTransitions)
 
@@ -212,20 +221,20 @@ export const visit = async (
   }
 
   if (config.render) {
-    if (shouldMorphHeads) Idiomorph.morph(document.head, newDocument.head)
+    updateHead()
     await config.render(newDocument)
   } else if (useViewTransitions && document.startViewTransition) {
     // Morph the head inside the callback so the browser's old-state snapshot
     // (taken synchronously when `startViewTransition` is called) still
     // reflects the current page's styles.
     await document.startViewTransition(async () => {
-      if (shouldMorphHeads) Idiomorph.morph(document.head, newDocument.head)
+      updateHead()
       await mergeRegions()
       await emit('after-swap', { from, to, isBackForward, signal })
       applyScrollBehavior()
     }).updateCallbackDone // `ready` rejects when the transition is skipped
   } else {
-    if (shouldMorphHeads) Idiomorph.morph(document.head, newDocument.head)
+    updateHead()
     await mergeRegions()
     await emit('after-swap', { from, to, isBackForward, signal })
     applyScrollBehavior()
