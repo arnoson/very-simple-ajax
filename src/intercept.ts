@@ -1,4 +1,5 @@
 import { config } from './config'
+import { prefetch } from './prefetch'
 import { currentState, currentUrl, normalizeUrl, visit } from './visit'
 import { MergeStrategy, VisitOptions } from './types'
 
@@ -10,20 +11,90 @@ export const interceptLinks = () => {
       | Element
       | undefined
     const link = target?.closest?.('a')
-    if (!link || !link.href) return
-
-    const isOptOut = link.hasAttribute(`${config.prefix}reload`)
-    const isExternalTarget = link.target && link.target !== '_self'
-    if (
-      isOptOut ||
-      link.hasAttribute('download') ||
-      isExternalTarget ||
-      !isSameOrigin(link.href)
-    )
-      return
+    if (!link || !isInterceptable(link)) return
 
     e.preventDefault()
     visit(link.href, { history: 'push', ...getVisitOptions(link) })
+  })
+}
+
+const isInterceptable = (link: HTMLAnchorElement) => {
+  if (!link.href) return false
+  const isExternalTarget = link.target && link.target !== '_self'
+  return !(
+    link.hasAttribute(`${config.prefix}reload`) ||
+    link.hasAttribute('download') ||
+    isExternalTarget ||
+    !isSameOrigin(link.href)
+  )
+}
+
+const HOVER_DELAY = 65
+
+const getPrefetchStrategy = (link: Element) => {
+  const attr = link.getAttribute(`${config.prefix}prefetch`)
+  if (attr === null) return config.prefetch
+  if (attr === 'false') return false
+  if (attr === 'hover' || attr === 'mousedown') return attr
+  return config.prefetch || 'hover'
+}
+
+export const interceptPrefetch = () => {
+  let hoverTimeout: number | undefined
+  let hoverLink: Element | undefined
+
+  const run = (link: HTMLAnchorElement) => {
+    if ((navigator as any).connection?.saveData) return
+    const url = normalizeUrl(link.href)
+    if (url === currentUrl) return
+    const regions = getVisitOptions(link).regions ?? config.regions
+    prefetch(url, regions)
+  }
+
+  const findLink = (e: Event) => {
+    const link = (e.target as Element | null)?.closest?.('a')
+    if (!link || !getPrefetchStrategy(link) || !isInterceptable(link)) return
+    return link
+  }
+
+  const clearHover = () => {
+    clearTimeout(hoverTimeout)
+    hoverLink = undefined
+  }
+
+  document.addEventListener('mouseover', (e) => {
+    const link = findLink(e)
+    if (!link || link === hoverLink || getPrefetchStrategy(link) !== 'hover')
+      return
+    clearHover()
+    hoverLink = link
+    hoverTimeout = window.setTimeout(() => run(link), HOVER_DELAY)
+  })
+
+  document.addEventListener('mouseout', (e) => {
+    const to = (e as MouseEvent).relatedTarget as Node | null
+    if (hoverLink && !(to && hoverLink.contains(to))) clearHover()
+  })
+
+  document.addEventListener('focusin', (e) => {
+    const link = findLink(e)
+    if (link && getPrefetchStrategy(link) === 'hover') run(link)
+  })
+
+  // Touch has no hover, so it counts as a press for both strategies.
+  document.addEventListener(
+    'touchstart',
+    (e) => {
+      const link = findLink(e)
+      if (link) run(link)
+    },
+    { passive: true },
+  )
+
+  document.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return
+    const link = findLink(e)
+    if (link) run(link)
   })
 }
 

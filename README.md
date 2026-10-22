@@ -39,6 +39,7 @@ without writing any JavaScript:
 | `data-ajax-history` | History mode to use: `push`, `replace` or `none`.                                    |
 | `data-ajax-merge`   | Merge strategy for the swapped content, e.g. `morph`, `replace`, `before`, `append`. |
 | `data-ajax-state`   | JSON encoded state to store in `history.state` for this visit.                       |
+| `data-ajax-prefetch` | Prefetch the link before it's clicked: `hover`, `mousedown` or `false` to opt out. Without a value the `prefetch` option is used, falling back to `hover`. |
 
 ```html
 <!-- only swap #content, preserving the merge strategy for that region -->
@@ -77,6 +78,11 @@ start({
   // Default selectors to swap instead of the whole `<body>`, used for visits
   // that don't specify their own `regions` (e.g. via `data-ajax-regions`).
   regions: [],
+  // Default prefetch strategy for links: false, 'hover' (hover/focus) or
+  // 'mousedown' (press). Touch always prefetches on touchstart.
+  prefetch: false,
+  // How long (ms) a prefetched response stays usable.
+  prefetchTtl: 30000,
   // Custom scroll handling, e.g. restoring position on back/forward visits.
   scrollBehavior: ({ isBackForward, savedPosition }) =>
     isBackForward ? savedPosition : { top: 0 },

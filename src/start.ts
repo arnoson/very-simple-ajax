@@ -1,6 +1,11 @@
 import { config } from './config'
 import { StartOptions } from './types'
-import { interceptLinks, interceptForms, interceptHistory } from './intercept'
+import {
+  interceptLinks,
+  interceptForms,
+  interceptHistory,
+  interceptPrefetch,
+} from './intercept'
 import { cache } from './load'
 import { normalizeUrl } from './visit'
 
@@ -19,6 +24,7 @@ export const start = (options: StartOptions = {}) => {
   interceptLinks()
   interceptForms()
   interceptHistory()
+  interceptPrefetch()
 
   if (import.meta.env.DEV) {
     document.addEventListener('ajax:before-visit', () => {

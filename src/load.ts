@@ -1,3 +1,4 @@
+import { takePrefetched } from './prefetch'
 import { EventMap, LoadingOptions } from './types'
 
 const parser = new DOMParser()
@@ -36,17 +37,21 @@ export const load = async (
       startTrickle()
     }, options.loadingDelay)
 
-    const response = await fetch(url, {
-      ...options.request,
-      headers: {
-        ...options.request?.headers,
-        'X-Very-Simple-Ajax': 'true',
-        'X-Very-Simple-Ajax-Regions': regions.join(' '),
-      },
-      signal: currentLoadController.signal,
-    })
+    const prefetched = await takePrefetched(url, regions)
 
-    const html = await response.text()
+    const response =
+      prefetched?.response ??
+      (await fetch(url, {
+        ...options.request,
+        headers: {
+          ...options.request?.headers,
+          'X-Very-Simple-Ajax': 'true',
+          'X-Very-Simple-Ajax-Regions': regions.join(' '),
+        },
+        signal: currentLoadController.signal,
+      }))
+
+    const html = prefetched?.html ?? (await response.text())
     if (response.ok) cache.set(url, html)
     const document = parseHtml(html)
     return { document, response }

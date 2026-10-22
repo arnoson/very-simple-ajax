@@ -14,4 +14,6 @@ export const config: InternalConfig = {
   progressHideDelay: 500,
   prefix: 'data-ajax-',
   regions: [],
+  prefetch: false,
+  prefetchTtl: 30000,
 }
