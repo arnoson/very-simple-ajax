@@ -105,7 +105,16 @@ export const visit = async (
   // try to receive the document from cache.
   if (isBackForward) {
     const html = cache.get(url)
-    if (html) newDocument = parseHtml(html)
+    if (html) {
+      const cached = parseHtml(html)
+      // The server may have returned only the regions of an earlier visit, so
+      // a cached page can lack regions we now need to restore.
+      const isComplete = regions.every(
+        (selector) =>
+          !document.querySelector(selector) || cached.querySelector(selector),
+      )
+      if (isComplete) newDocument = cached
+    }
   }
 
   // Load the new document if we don't use it from cache. There might also be
