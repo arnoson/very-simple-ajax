@@ -159,14 +159,15 @@ export const interceptHistory = () => {
     // stand instead of re-visiting the page.
     if (normalizeUrl(window.location.href) === normalizeUrl(currentUrl)) return
 
-    // Use the regions from the state of the page we're navigating away from
-    // (not `event.state`, which belongs to the page we're going back/forward
-    // to) since those are the regions that were used to reach the current
-    // page and describe the diff between it and the target page.
+    // The regions of the entry that was visited last describe the diff
+    // between two neighbouring entries: going back, that's the entry we're
+    // leaving; going forward, it's the entry we're entering.
+    const isBack = (event.state?.index ?? 0) < (currentState?.index ?? 0)
+    const regions = isBack ? currentState?.regions : event.state?.regions
     visit(window.location.href, {
       history: 'none',
       isBackForward: true,
-      regions: currentState?.regions ?? config.regions,
+      regions: regions ?? config.regions,
       state: event.state,
     })
   })

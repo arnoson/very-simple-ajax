@@ -75,7 +75,13 @@ export const visit = async (
   const fromUrl = currentUrl
   const fromState = currentState
 
-  state = { ...state, regions }
+  // Back/forward targets keep the state they were stored with, so their
+  // regions and index aren't overwritten by the regions of another visit.
+  if (!(isBackForward && state)) {
+    const currentIndex = currentState?.index ?? 0
+    const index = historyMode === 'push' ? currentIndex + 1 : currentIndex
+    state = { ...state, regions, index }
+  }
 
   currentVisitController?.abort()
   currentVisitController = new AbortController()

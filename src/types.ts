@@ -5,6 +5,8 @@ export interface AjaxState extends Record<string, unknown> {
   // The regions used for the visit, so they can be reused on back/forward
   // visits. Set internally, not part of the public `state` option.
   regions?: string[]
+  // Position in the session history, used to detect back vs. forward.
+  index?: number
 }
 
 /** Also accepts all `Config` options, e.g. `merge`, `scrollBehavior`, etc. */
@@ -14,7 +16,7 @@ export interface VisitOptions extends Config {
   autoFocus?: boolean
   request?: RequestInit
   regions?: string[]
-  state?: Omit<AjaxState, 'regions'>
+  state?: Omit<AjaxState, 'regions' | 'index'>
 }
 
 export type StartOptions = Config

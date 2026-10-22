@@ -337,3 +337,47 @@ test('the regions option in start() sets default regions for all visits', async 
   )
   expect(newHash).toBe(hash)
 })
+
+test('back/forward use the regions of the entry that was visited', async ({
+  page,
+}) => {
+  const pageHtml = (name: string) => `<!doctype html><html><head>
+    <title>${name}</title><script src="/example/index.ts" type="module"></script>
+    </head><body><div id="a">${name}-a</div><div id="b">${name}-b</div></body></html>`
+
+  for (const name of ['one', 'two', 'three']) {
+    await page.route(`**/example/${name}.html`, (route) =>
+      route.fulfill({ contentType: 'text/html', body: pageHtml(name) }),
+    )
+  }
+
+  await page.goto('/example/one.html')
+  await page.waitForFunction(() => (window as any).ajax)
+
+  const visit = (url: string, regions?: string[]) =>
+    page.evaluate(
+      ([url, regions]) =>
+        // @ts-ignore
+        window.ajax.visit(url, { history: 'push', regions }),
+      [url, regions] as const,
+    )
+
+  await visit('/example/two.html', ['#a', '#b'])
+  await visit('/example/three.html', ['#b'])
+  await expect(page.locator('#a')).toHaveText('two-a')
+  await expect(page.locator('#b')).toHaveText('three-b')
+
+  // Undo the `#b` visit.
+  await page.goBack()
+  await expect(page.locator('#b')).toHaveText('two-b')
+
+  // Undo the visit that swapped both regions.
+  await page.goBack()
+  await expect(page.locator('#a')).toHaveText('one-a')
+  await expect(page.locator('#b')).toHaveText('one-b')
+
+  // Redo the visit that swapped both regions.
+  await page.goForward()
+  await expect(page.locator('#a')).toHaveText('two-a')
+  await expect(page.locator('#b')).toHaveText('two-b')
+})
