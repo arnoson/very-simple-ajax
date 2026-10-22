@@ -1,6 +1,6 @@
 {
   "name": "@very-simple/ajax",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.8",
   "description": "A very simple turbolinks inspired ajax library",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
