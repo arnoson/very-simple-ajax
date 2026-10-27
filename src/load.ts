@@ -77,9 +77,9 @@ export const load = async (
 export const parseHtml = (html: string): Document =>
   parser.parseFromString(html, 'text/html')
 
+// Each step is a fraction of the remaining distance, so progress never reaches 1.
 const trickle = () => {
-  const amount = -0.095 * progress + 0.1
-  setProgress(progress + Math.random() * amount)
+  setProgress(progress + Math.random() * 0.1 * (1 - progress))
 }
 
 const startTrickle = () => {

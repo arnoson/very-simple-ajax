@@ -15,7 +15,7 @@ const myPlugin = (): Plugin => ({
         }
 
         if (req.url === '/example/delay.html') {
-          setTimeout(next, 3000)
+          setTimeout(next, 10000)
           return
         }
 
