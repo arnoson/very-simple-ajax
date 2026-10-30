@@ -29,7 +29,7 @@ const isInterceptable = (link: HTMLAnchorElement) => {
   )
 }
 
-const HOVER_DELAY = 65
+const hoverDelay = 100
 
 const getPrefetchStrategy = (link: Element) => {
   const attr = link.getAttribute(`${config.prefix}prefetch`)
@@ -68,7 +68,7 @@ export const interceptPrefetch = () => {
       return
     clearHover()
     hoverLink = link
-    hoverTimeout = window.setTimeout(() => run(link), HOVER_DELAY)
+    hoverTimeout = window.setTimeout(() => run(link), hoverDelay)
   })
 
   document.addEventListener('mouseout', (e) => {
