@@ -66,7 +66,7 @@ export const visit = async (
     head = config.head,
     merge: mergeStrategy = config.merge,
     executeScripts: executeScriptsOption = config.executeScripts,
-    viewTransitions = config.viewTransitions,
+    transitions = config.transitions,
     loadingDelay = config.loadingDelay,
     progressHideDelay = config.progressHideDelay,
   }: VisitOptions = {},
@@ -166,12 +166,12 @@ export const visit = async (
     })
   }
   const shouldExecuteScripts = resolve(executeScriptsOption)
-  const useViewTransitions = resolve(viewTransitions)
+  const transition = resolve(transitions)
 
   const getMergeStrategy = (oldEl: HTMLElement, newEl: HTMLElement) =>
-    newEl.getAttribute(`${config.prefix}merge`) ||
-    oldEl.getAttribute(`${config.prefix}merge`) ||
-    mergeStrategy
+    (newEl.getAttribute(`${config.prefix}merge`) ||
+      oldEl.getAttribute(`${config.prefix}merge`) ||
+      mergeStrategy) as MergeStrategy
 
   let autoFocusEl: HTMLElement | undefined
 
@@ -193,7 +193,13 @@ export const visit = async (
         // parser document.
         const newRegion = document.importNode(parsedRegion, true)
         const strategy = getMergeStrategy(region, newRegion)
-        const result = merge(region, newRegion, strategy as MergeStrategy)
+        const result = await merge(
+          region,
+          newRegion,
+          strategy,
+          signal,
+          transition === 'css',
+        )
         // Use the auto-focusable element from the first region that has one.
         autoFocusEl ??= result.autoFocusEl
 
@@ -207,7 +213,7 @@ export const visit = async (
       const region = document.body
       const newRegion = document.importNode(newDocument.body, true)
       const strategy = getMergeStrategy(region, newRegion)
-      const result = merge(region, newRegion, strategy as MergeStrategy)
+      const result = await merge(region, newRegion, strategy, signal)
       autoFocusEl = result.autoFocusEl
 
       if (shouldExecuteScripts) {
@@ -235,10 +241,7 @@ export const visit = async (
     if (position) window.scrollTo(position)
   }
 
-  if (config.render) {
-    updateHead()
-    await config.render(newDocument)
-  } else if (useViewTransitions && document.startViewTransition) {
+  if (transition === 'view' && document.startViewTransition) {
     // Morph the head inside the callback so the browser's old-state snapshot
     // (taken synchronously when `startViewTransition` is called) still
     // reflects the current page's styles.

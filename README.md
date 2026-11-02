@@ -67,8 +67,10 @@ start({
   head: 'merge',
   // Re-execute `<script>` tags found in the swapped content.
   executeScripts: true,
-  // Wrap navigations in the View Transitions API, if supported.
-  viewTransitions: false,
+  // `'view'` wraps the swap in the View Transitions API (if supported), `'css'`
+  // keeps the old and new region in the DOM and sets `data-ajax-leaving` /
+  // `data-ajax-entering` for CSS transitions (only for the `replace` merge).
+  transitions: false,
   // Delay (ms) before showing a loading indicator on slow visits.
   loadingDelay: 500,
   // Delay (ms) before hiding the loading indicator again.
@@ -93,7 +95,7 @@ start({
 })
 ```
 
-`head`, `executeScripts` and `viewTransitions` also accept a callback
+`head`, `executeScripts` and `transitions` also accept a callback
 receiving `{ from, to, isBackForward }`. Combined with `data-ajax-state` this
 allows deciding per link, e.g. to only add new `<head>` elements (scripts,
 styles) without removing existing ones when loading a partial:

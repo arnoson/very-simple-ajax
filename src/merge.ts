@@ -3,7 +3,74 @@ import { MergeStrategy } from './types'
 import { Idiomorph } from 'idiomorph/dist/idiomorph.esm.js'
 import { config } from './config'
 
-export const merge = (
+export const merge = async (
+  region: HTMLElement,
+  newRegion: HTMLElement,
+  strategy: MergeStrategy,
+  signal: AbortSignal,
+  useCssTransition = false,
+): Promise<{ autoFocusEl: HTMLElement | undefined }> => {
+  if (useCssTransition && strategy === 'replace') {
+    return replaceWithTransition(region, newRegion, signal)
+  }
+  return mergeBuiltIn(region, newRegion, strategy)
+}
+
+// Both regions are in the DOM while the transition runs; the new one comes
+// first so selector lookups find it.
+const replaceWithTransition = async (
+  region: HTMLElement,
+  newRegion: HTMLElement,
+  signal: AbortSignal,
+) => {
+  const { prefix, mount, unmount } = config
+  const escapedPrefix = CSS.escape(prefix)
+
+  newRegion
+    .querySelectorAll(`[${escapedPrefix}permanent][id]`)
+    .forEach((el) => {
+      const original = region.querySelector(`#${CSS.escape(el.id)}`)
+      if (original) el.replaceWith(original)
+    })
+
+  newRegion.setAttribute(`${prefix}entering`, '')
+  region.before(newRegion)
+  mount?.(newRegion)
+  // Commit the entering styles so removing the attribute transitions.
+  newRegion.getBoundingClientRect()
+  newRegion.removeAttribute(`${prefix}entering`)
+  region.setAttribute(`${prefix}leaving`, '')
+  region.inert = true
+
+  const animations = [region, newRegion].flatMap((el) =>
+    el.getAnimations({ subtree: true }),
+  )
+  const finish = () => animations.forEach((a) => a.finish())
+  signal.addEventListener('abort', finish, { once: true })
+  await Promise.allSettled(animations.map((a) => a.finished))
+  signal.removeEventListener('abort', finish)
+
+  unmount?.(region)
+  region.remove()
+  return { autoFocusEl: findAutoFocus(newRegion) }
+}
+
+const findAutoFocus = (newRegion: HTMLElement) => {
+  const { prefix } = config
+  const escapedPrefix = CSS.escape(prefix)
+  // [ajax-autofocus] wins over [autofocus]. First test the new region itself ...
+  if (newRegion.hasAttribute(`${prefix}autofocus`) || newRegion.autofocus) {
+    return newRegion
+  }
+  // ... then look into it's children.
+  return (
+    newRegion.querySelector<HTMLElement>(`[${escapedPrefix}autofocus]`) ??
+    newRegion.querySelector<HTMLElement>('[autofocus]') ??
+    undefined
+  )
+}
+
+const mergeBuiltIn = (
   region: HTMLElement,
   newRegion: HTMLElement,
   strategy: MergeStrategy,
@@ -57,18 +124,7 @@ export const merge = (
   // For morph, newRegion stays detached, so morph() already found the element.
   if (strategy === 'morph') return { autoFocusEl }
 
-  // Find the first auto focus element, where [ajax-autofocus] wins over
-  // [autofocus]. First test the new region itself ...
-  if (newRegion.hasAttribute(`${prefix}autofocus`) || newRegion.autofocus) {
-    autoFocusEl ??= newRegion
-  }
-  // ... then look into it's children.
-  autoFocusEl ??=
-    newRegion.querySelector<HTMLElement>(`[${escapedPrefix}autofocus]`) ??
-    newRegion.querySelector<HTMLElement>('[autofocus]') ??
-    undefined
-
-  return { autoFocusEl }
+  return { autoFocusEl: findAutoFocus(newRegion) }
 }
 
 const morph = (container: Element, newContainer: Element) => {

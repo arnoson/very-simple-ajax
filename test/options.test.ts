@@ -111,7 +111,7 @@ test('executeScripts callback can skip executing scripts', async ({ page }) => {
     .toBe(true)
 })
 
-test('viewTransitions callback decides whether a transition is used', async ({
+test('transitions callback decides whether a transition is used', async ({
   page,
 }) => {
   await page.goto('/example/index.html')
@@ -129,7 +129,7 @@ test('viewTransitions callback decides whether a transition is used', async ({
     // @ts-ignore
     window.ajax.visit('/example/about.html', {
       history: 'push',
-      viewTransitions: () => false,
+      transitions: () => false,
     }),
   )
   await expect(page.locator('h1')).toHaveText('About')
@@ -139,7 +139,7 @@ test('viewTransitions callback decides whether a transition is used', async ({
     // @ts-ignore
     window.ajax.visit('/example/index.html', {
       history: 'push',
-      viewTransitions: () => true,
+      transitions: () => 'view',
     }),
   )
   await expect(page.locator('#heading')).toHaveText('Home')

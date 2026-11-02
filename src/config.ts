@@ -1,15 +1,15 @@
 import { Config } from './types'
 
 type InternalConfig = Required<
-  Omit<Config, 'mount' | 'unmount' | 'render' | 'scrollBehavior'>
+  Omit<Config, 'mount' | 'unmount' | 'scrollBehavior'>
 > &
-  Pick<Config, 'mount' | 'unmount' | 'render' | 'scrollBehavior'>
+  Pick<Config, 'mount' | 'unmount' | 'scrollBehavior'>
 
 export const config: InternalConfig = {
   head: 'merge',
   merge: 'replace',
   executeScripts: true,
-  viewTransitions: false,
+  transitions: false,
   loadingDelay: 500,
   progressHideDelay: 500,
   prefix: 'data-ajax-',

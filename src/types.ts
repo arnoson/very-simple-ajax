@@ -50,10 +50,13 @@ export interface Config {
   head?: Resolvable<HeadMode>
   /** Re-execute `<script>` tags found in the swapped content. A callback decides per visit. */
   executeScripts?: Resolvable<boolean>
-  /** Wrap navigations in the View Transitions API, if supported. A callback decides per visit. */
-  viewTransitions?: Resolvable<boolean>
-  /** Called instead of the default merge to render the new document. */
-  render?: (newDocument: Document) => Promise<void> | void
+  /**
+   * `'view'` wraps the swap in the View Transitions API (if supported), `'css'`
+   * keeps the old and new region in the DOM and sets `data-ajax-leaving` /
+   * `data-ajax-entering` so CSS can animate them (only for `replace`). A
+   * callback decides per visit.
+   */
+  transitions?: Resolvable<false | 'view' | 'css'>
   /** Custom scroll handling, e.g. restoring position on back/forward visits. */
   scrollBehavior?: ScrollBehavior
   /** Delay (ms) before showing a loading indicator on slow visits. */
