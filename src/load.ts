@@ -44,6 +44,7 @@ export const load = async (
       (await fetch(url, {
         ...options.request,
         headers: {
+          Accept: 'text/html',
           ...options.request?.headers,
           'X-Very-Simple-Ajax': 'true',
           'X-Very-Simple-Ajax-Regions': regions.join(' '),

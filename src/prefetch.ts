@@ -2,7 +2,10 @@ import { config } from './config'
 
 type Prefetched = { html: string; response: Response }
 
-const store = new Map<string, { time: number; promise: Promise<Prefetched | undefined> }>()
+const store = new Map<
+  string,
+  { time: number; promise: Promise<Prefetched | undefined> }
+>()
 
 const keyOf = (url: string, regions: string[]) => `${url}\n${regions.join(' ')}`
 
@@ -16,6 +19,7 @@ export const prefetch = (url: string, regions: string[]) => {
 
   const promise = fetch(url, {
     headers: {
+      Accept: 'text/html',
       'X-Very-Simple-Ajax': 'true',
       'X-Very-Simple-Ajax-Regions': regions.join(' '),
     },
